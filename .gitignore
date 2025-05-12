@@ -1,0 +1,5 @@
+.idea/
+*.pdf
+__pycache__/
+*.pyc
+.env
