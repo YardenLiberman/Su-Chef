@@ -384,13 +384,6 @@ class VoiceAgent:
             print("❌ Voice guidance requires Azure Speech Services!")
             return False
         
-        # Test voice recognition first
-        self.speak("Voice guidance starting. Please say 'test' to confirm your microphone is working.")
-        test_response = self.listen()
-        if test_response is None:
-            print("❌ Voice recognition not working. Please check your microphone and try again.")
-            return False
-        
         recipe = self.current_recipe
         
         # Introduction
@@ -457,8 +450,57 @@ class VoiceAgent:
                 else:
                     # Use AI to answer cooking questions
                     self._handle_cooking_question(response, step)
+            
+            # Ask if ready for next step (except for the last step)
+            if i < len(recipe['steps']):
+                self.speak("Are you ready for the next step?")
+                ready_retry_count = 0
+                while True:
+                    response = self.listen()
+                    if response is None:
+                        ready_retry_count += 1
+                        if ready_retry_count >= 3:
+                            self.speak("Moving to next step.")
+                            break
+                        self.speak("I didn't hear you. Say 'yes' when ready for the next step.")
+                        continue
+                    
+                    if any(word in response.lower() for word in ['yes', 'ready', 'next', 'continue']):
+                        break
+                    elif any(word in response.lower() for word in ['no', 'wait', 'hold']):
+                        self.speak("Take your time. Say 'ready' when you want to continue.")
+                    elif any(word in response.lower() for word in ['stop', 'quit', 'exit']):
+                        self.speak("Cooking stopped. Come back anytime!")
+                        self.is_interrupted = True
+                        return False
+                    else:
+                        self.speak("Say 'yes' when you're ready for the next step, or 'no' if you need more time.")
         
         self.speak("Congratulations! You've finished cooking. Enjoy your meal!")
+        
+        # Final completion confirmation
+        self.speak("Cooking session complete! Say 'finished' to end, or 'repeat last step' if you need to hear the final step again.")
+        final_retry_count = 0
+        while True:
+            response = self.listen()
+            if response is None:
+                final_retry_count += 1
+                if final_retry_count >= 3:
+                    self.speak("Cooking session ended. Great job!")
+                    break
+                self.speak("Say 'finished' to complete the cooking session.")
+                continue
+            
+            response_lower = response.lower()
+            if any(word in response_lower for word in ['finished', 'done', 'complete', 'end']):
+                self.speak("Excellent work! Hope you enjoy your meal!")
+                break
+            elif any(word in response_lower for word in ['repeat', 'last', 'final']):
+                final_step = len(recipe['steps'])
+                self.speak(f"Final step: {recipe['steps'][final_step-1]}")
+            else:
+                self.speak("Say 'finished' when you're done cooking.")
+        
         return True
     
     def _handle_cooking_question(self, question: str, current_step: str):
@@ -519,10 +561,9 @@ class SuChef:
             print("2. View saved recipes")
             print("3. Search recipes")
             print("4. Load recipe from file")
-            print("5. View statistics")
-            print("6. Exit")
+            print("5. Exit")
             
-            choice = input("\nChoose option (1-6): ").strip()
+            choice = input("\nChoose option (1-5): ").strip()
             
             if choice == "1":
                 self._create_recipe_workflow()
@@ -533,12 +574,10 @@ class SuChef:
             elif choice == "4":
                 self._load_file_workflow()
             elif choice == "5":
-                self._show_statistics()
-            elif choice == "6":
                 print("Happy cooking! 👨‍🍳")
                 break
             else:
-                print("Please enter a valid option (1-6)")
+                print("Please enter a valid option (1-5)")
     
     def _create_recipe_workflow(self):
         """Handle recipe creation workflow."""
@@ -585,7 +624,7 @@ class SuChef:
         if recipe_text:
             print("\n" + "="*50)
             print("GENERATED RECIPE:")
-            print("="*50)
+            print(f"="*50)
             print(recipe_text)
             
             save = input("\nSave this recipe? (y/n): ").strip().lower()
@@ -777,8 +816,8 @@ class SuChef:
             print("-"*40)
             print("1. Start voice guidance")
             print("2. View recipe details")
-            print("3. Select different recipe")
-            print("4. Back to main menu")
+            print("3. Back to main menu")
+            print("4. Select different recipe")
             
             choice = input("Choose (1-4): ").strip()
             
@@ -789,9 +828,9 @@ class SuChef:
                 self._show_recipe_details()
                 input("\nPress Enter to continue...")
             elif choice == "3":
-                self._view_recipes_workflow()
                 break
             elif choice == "4":
+                self._view_recipes_workflow()
                 break
             else:
                 print("Please enter a valid option (1-4)")
@@ -833,25 +872,6 @@ class SuChef:
             liked = input("Did you like it? (y/n): ").strip().lower() == 'y'
             self.db.mark_recipe_cooked(self.user_id, self.current_recipe_id, liked)
             print("✅ Recipe marked as cooked!")
-    
-    def _show_statistics(self):
-        """Show user cooking statistics."""
-        stats = self.db.get_user_statistics(self.user_id)
-        
-        print(f"\n{'='*40}")
-        print("📊 YOUR COOKING STATISTICS")
-        print(f"{'='*40}")
-        print(f"Total recipes: {stats['total']}")
-        print(f"Recipes cooked: {stats['cooked']}")
-        print(f"Recipes liked: {stats['liked']}")
-        
-        if stats['total'] > 0:
-            completion_rate = (stats['cooked'] / stats['total']) * 100
-            print(f"Completion rate: {completion_rate:.1f}%")
-            
-            if stats['cooked'] > 0:
-                like_rate = (stats['liked'] / stats['cooked']) * 100
-                print(f"Like rate: {like_rate:.1f}%")
     
     def _get_positive_integer(self, prompt: str, default: int = 0) -> int:
         """Get positive integer input with default."""
