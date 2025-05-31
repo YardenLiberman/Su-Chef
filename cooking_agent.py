@@ -310,63 +310,53 @@ class CookingAgent:
             self.context["conversation_history"] = self.context["conversation_history"][-5:]
         
         # Build comprehensive context with complete recipe data
-        recent_questions = "\n".join([f"Q: {q['question']} (Step {q['step']})" 
+        recent_questions = "\n".join([f"Step {q['step']}: {q['question']} (type: {q['type']})" 
                                     for q in self.context["conversation_history"][-3:]])
         
-        # Create clean, structured context for AI (Option 1 approach)
-        progress_percentage = int((self.current_step / len(self.recipe_steps)) * 100)
+        # Create complete recipe JSON for AI
+        complete_recipe_data = {
+            "recipe_name": self.recipe_name,
+            "total_steps": len(self.recipe_steps),
+            "current_step_number": self.current_step + 1,
+            "current_step_text": current_step,
+            "all_steps": [{"step_number": i+1, "instruction": step} for i, step in enumerate(self.recipe_steps)],
+            "ingredients": self.recipe_ingredients,
+            "completed_steps": [{"step_number": i+1, "instruction": step} for i, step in enumerate(self.recipe_steps[:self.current_step])],
+            "remaining_steps": [{"step_number": i+1, "instruction": step} for i, step in enumerate(self.recipe_steps[self.current_step+1:], self.current_step+2)],
+            "cooking_progress": f"{self.current_step}/{len(self.recipe_steps)} steps completed",
+            "is_first_step": self.current_step == 0,
+            "is_last_step": self.current_step == len(self.recipe_steps) - 1
+        }
         
-        # Previous step info
-        previous_step_text = ""
-        if self.current_step > 0:
-            previous_step_text = f"PREVIOUS STEP (COMPLETED):\nStep {self.current_step}: {self.recipe_steps[self.current_step - 1]}\n"
-        else:
-            previous_step_text = "PREVIOUS STEP: None (this is the first step)\n"
-        
-        # Next step info
-        next_step_text = ""
-        if self.current_step < len(self.recipe_steps) - 1:
-            next_step_text = f"\nNEXT STEP (UPCOMING):\nStep {self.current_step + 2}: {self.recipe_steps[self.current_step + 1]}"
-            # Add one more step if available
-            if self.current_step < len(self.recipe_steps) - 2:
-                next_step_text += f"\nStep {self.current_step + 3}: {self.recipe_steps[self.current_step + 2]}"
-        else:
-            next_step_text = "\nNEXT STEP: None (this is the final step)"
-        
-        # Ingredients list
-        ingredients_text = ""
-        if self.recipe_ingredients:
-            ingredients_text = "\nINGREDIENTS AVAILABLE:\n" + "\n".join([f"• {ingredient}" for ingredient in self.recipe_ingredients])
-        else:
-            ingredients_text = "\nINGREDIENTS: Not available in recipe data"
-        
-        # Recent conversation
-        conversation_text = ""
-        if recent_questions:
-            conversation_text = f"\nRECENT CONVERSATION:\n{recent_questions}"
-        else:
-            conversation_text = "\nRECENT CONVERSATION: No previous questions in this session"
-        
-        context_info = f"""RECIPE: {self.recipe_name} (Step {self.current_step + 1} of {len(self.recipe_steps)})
-PROGRESS: {progress_percentage}% complete
+        context_info = f"""
+COMPLETE RECIPE DATA (JSON):
+{json.dumps(complete_recipe_data, indent=2)}
 
-{previous_step_text}
-CURRENT STEP (NOW):
-Step {self.current_step + 1}: {current_step}
-{next_step_text}
-{ingredients_text}
-{conversation_text}
+ORIGINAL RECIPE METADATA:
+{json.dumps(self.original_recipe_data, indent=2)}
 
-USER QUESTION: "{question}"
-QUESTION TYPE: {analysis['type']}
-URGENCY: {'🚨 SAFETY CONCERN' if analysis['is_urgent'] else 'Normal'}
+COOKING SESSION STATE:
+- User is currently on step {self.current_step + 1} of {len(self.recipe_steps)}
+- Progress: {((self.current_step) / len(self.recipe_steps) * 100):.1f}% complete
+- Current instruction: "{current_step}"
 
-INSTRUCTIONS FOR AI:
-- Answer based on the clear step information above
-- Reference specific step numbers when helpful
-- Use the ingredients list for substitution questions
-- Consider their progress for timing questions
-- Be specific and practical"""
+RECENT CONVERSATION HISTORY:
+{recent_questions if recent_questions else "- No previous questions in this session"}
+
+CURRENT USER QUESTION: "{question}"
+QUESTION ANALYSIS:
+- Type: {analysis['type']}
+- Urgency: {'HIGH - Safety concern!' if analysis['is_urgent'] else 'Normal'}
+- Needs demonstration: {'Yes' if analysis['needs_demo'] else 'No'}
+- Step-specific: {'Yes' if analysis['step_specific'] else 'No'}
+
+CONTEXT NOTES:
+- User has access to all ingredients listed in the recipe
+- User can ask about any step (past, current, or future)
+- User may need help with techniques, timing, substitutions, or troubleshooting
+- Keep responses practical and specific to their current cooking situation
+- Use original recipe metadata (cooking time, difficulty, etc.) when relevant
+"""
         
         try:
             messages = [
