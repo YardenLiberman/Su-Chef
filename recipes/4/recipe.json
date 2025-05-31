@@ -1,0 +1,25 @@
+{
+    "name": "Easy Banana Pancakes",
+    "meal_type": "breakfast",
+    "cooking_time": 90,
+    "skill_level": "beginner",
+    "dietary_restrictions": null,
+    "ingredients": [
+        "1 ripe banana",
+        "1 egg",
+        "1/2 cup all-purpose flour",
+        "1/2 cup milk",
+        "1 tsp baking powder",
+        "Pinch of salt",
+        "Butter or oil for cooking"
+    ],
+    "instructions": [
+        "In a mixing bowl, mash the banana with a fork until smooth.",
+        "Add the egg, flour, milk, baking powder, and salt to the bowl. Mix until well combined.",
+        "Heat a non-stick skillet or griddle over medium heat and add a little butter or oil.",
+        "Pour 1/4 cup of the pancake batter onto the skillet for each pancake.",
+        "Cook for 2-3 minutes until bubbles form on the surface, then flip and cook for another 1-2 minutes until golden brown.",
+        "Repeat with the remaining batter.",
+        "Serve the pancakes warm with your favorite toppings. Enjoy your delicious and easy banana pancakes!"
+    ]
+}

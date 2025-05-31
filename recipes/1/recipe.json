@@ -1,0 +1,21 @@
+{
+    "name": "Easy Lemon Herb Chicken",
+    "meal_type": "1",
+    "cooking_time": 30,
+    "skill_level": "1",
+    "dietary_restrictions": "kosher",
+    "ingredients": [
+        "2 boneless, skinless chicken breasts",
+        "2 tablespoons olive oil",
+        "1 lemon, juiced and zested",
+        "2 cloves garlic, minced",
+        "1 teaspoon dried oregano",
+        "Salt and pepper to taste"
+    ],
+    "instructions": [
+        "In a small bowl, mix together olive oil, lemon juice, lemon zest, garlic, oregano, salt, and pepper.",
+        "Place chicken breasts in a shallow dish and pour the marinade over them. Let them marinate for 10 minutes.",
+        "Heat a skillet over medium-high heat. Add the chicken breasts and cook for about 6-7 minutes per side, or until cooked through.",
+        "Serve the chicken with your favorite side dishes and enjoy!"
+    ]
+}

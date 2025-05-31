@@ -1,0 +1,21 @@
+{
+    "recipe_name": "Vegan Avocado Hummus",
+    "steps": [
+        {
+            "step_number": 1,
+            "text": "In a food processor, combine the avocado, chickpeas, garlic, tahini, lemon juice, and olive oil. Blend until smooth."
+        },
+        {
+            "step_number": 2,
+            "text": "Season with salt and pepper to taste."
+        },
+        {
+            "step_number": 3,
+            "text": "Transfer the hummus to a serving bowl and drizzle with olive oil. Sprinkle with paprika and sesame seeds if desired."
+        },
+        {
+            "step_number": 4,
+            "text": "Serve with pita bread, veggie sticks, or crackers. Enjoy your delicious vegan avocado hummus!"
+        }
+    ]
+}
