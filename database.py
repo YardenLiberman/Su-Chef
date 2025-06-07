@@ -170,49 +170,7 @@ class RecipeDatabase:
         with open(os.path.join(recipe_dir, 'metadata.json'), 'w') as f:
             json.dump(metadata, f, indent=4)
 
-    def get_step(self, recipe_id, step_number):
-        """Get specific step from a recipe"""
-        cursor = self.conn.cursor()
-        cursor.execute('''
-        SELECT step_text, estimated_time, tips
-        FROM steps
-        WHERE recipe_id = ? AND step_number = ?
-        ''', (recipe_id, step_number))
-        return cursor.fetchone()
-    
-    def get_next_step(self, recipe_id, current_step):
-        """Get the next step in sequence"""
-        cursor = self.conn.cursor()
-        cursor.execute('''
-        SELECT step_number, step_text
-        FROM steps
-        WHERE recipe_id = ? AND step_number > ?
-        ORDER BY step_number
-        LIMIT 1
-        ''', (recipe_id, current_step))
-        return cursor.fetchone()
-    
-    def get_previous_step(self, recipe_id, current_step):
-        """Get the previous step in sequence"""
-        cursor = self.conn.cursor()
-        cursor.execute('''
-        SELECT step_number, step_text
-        FROM steps
-        WHERE recipe_id = ? AND step_number < ?
-        ORDER BY step_number DESC
-        LIMIT 1
-        ''', (recipe_id, current_step))
-        return cursor.fetchone()
-    
-    def update_step_progress(self, user_id, recipe_id, step_number):
-        """Update the last completed step for a user's recipe"""
-        cursor = self.conn.cursor()
-        cursor.execute('''
-        UPDATE user_recipe_history
-        SET last_step_completed = ?
-        WHERE user_id = ? AND recipe_id = ?
-        ''', (step_number, user_id, recipe_id))
-        self.conn.commit()
+
     
     def search_recipes(self, query=None, user_id=None, search_type='name'):
         """
@@ -296,40 +254,7 @@ class RecipeDatabase:
         ''', (user_id,))
         return cursor.fetchall()
     
-    def get_user_liked_recipes(self, user_id):
-        cursor = self.conn.cursor()
-        cursor.execute('''
-        SELECT r.*
-        FROM recipes r
-        JOIN user_recipe_history urh ON r.recipe_id = urh.recipe_id
-        WHERE urh.user_id = ? AND urh.liked = TRUE
-        ORDER BY urh.cooked_date DESC
-        ''', (user_id,))
-        return cursor.fetchall()
-    
-    def update_user_preferences(self, user_id, preferences):
-        cursor = self.conn.cursor()
-        cursor.execute('''
-        INSERT OR REPLACE INTO user_preferences 
-        (user_id, meal_type, cooking_time_preference, skill_level, dietary_restrictions)
-        VALUES (?, ?, ?, ?, ?)
-        ''', (
-            user_id,
-            preferences.get('meal_type'),
-            preferences.get('cooking_time'),
-            preferences.get('skill_level'),
-            preferences.get('dietary_restrictions')
-        ))
-        self.conn.commit()
-    
-    def get_user_preferences(self, user_id):
-        cursor = self.conn.cursor()
-        cursor.execute('''
-        SELECT meal_type, cooking_time_preference, skill_level, dietary_restrictions
-        FROM user_preferences
-        WHERE user_id = ?
-        ''', (user_id,))
-        return cursor.fetchone()
+
     
     def close(self):
         self.conn.close() 

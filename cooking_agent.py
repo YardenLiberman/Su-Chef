@@ -7,10 +7,8 @@ from typing import Optional, Dict, List, Any
 
 class CookingAgent:
     def __init__(self):
-        print("Initializing CookingAgent...")
         # Load environment variables
         load_dotenv()
-        print("Environment variables loaded")
         
         # Azure Speech Service configuration
         self.speech_key = os.getenv("SPEECH_KEY")
@@ -18,21 +16,15 @@ class CookingAgent:
         self.voice_name = os.getenv("VOICE_NAME", "en-US-JennyMultilingualNeural")
         self.language = os.getenv("LANGUAGE", "en-US")
         
-        print(f"Speech key found: {bool(self.speech_key)}")
-        print(f"Speech region: {self.speech_region}")
-        
         # Check if required keys are present
         if not self.speech_key:
             print("Error: SPEECH_KEY not found in environment variables!")
-            print("Please check your .env file.")
             return
         
         # OpenAI configuration
         self.api_key = os.getenv("OPENAI_API_KEY")
-        print(f"OpenAI key found: {bool(self.api_key)}")
         if not self.api_key:
             print("Error: OPENAI_API_KEY not found in environment variables!")
-            print("Please add your OpenAI API key to the .env file.")
             return
             
         if self.api_key and self.api_key.startswith('sk-proj-'):
@@ -46,19 +38,35 @@ class CookingAgent:
         self.recipe_name = ""
         self.original_recipe_data = {}  # Store complete original JSON
         self.is_interrupted = False
-        self.context = {
-            "needs_help": False,
-            "last_question": None,
-            "current_focus": None,
-            "conversation_history": [],
-            "user_preferences": {},
-            "cooking_start_time": None
+        self.is_completed = False  # Track if recipe was completed successfully
+        
+        # ENHANCED LEARNING: Add comprehensive user model tracking
+        self.user_model = {
+            "cooking_pace": "normal",  # slow/normal/fast
+            "question_patterns": {},   # track question types
+            "confusion_count": 0,      # track confusion indicators
+            "session_questions": [],   # current session questions
+            "preferences": {},         # learned preferences
+            "skill_indicators": {      # track skill level indicators
+                "technique_questions": 0,
+                "timing_questions": 0,
+                "troubleshooting_questions": 0,
+                "equipment_questions": 0
+            },
+            "interaction_patterns": {  # track interaction patterns
+                "quick_navigation": 0,
+                "detailed_questions": 0,
+                "repeat_requests": 0
+            },
+            "step_timing": [],         # track time spent on each step
+            "common_confusions": []    # track what confuses the user
         }
         
-        print("Initializing speech services...")
+        # LEARNING: Session tracking
+        self.session_start_time = None
+        
         # Initialize speech services
         self._init_speech_services()
-        print("CookingAgent initialization complete!")
         
     def _init_speech_services(self):
         """Initialize Azure speech services."""
@@ -88,75 +96,29 @@ class CookingAgent:
         # Test microphone access
         self.test_microphone()
         
-    def check_microphone_settings(self):
-        """Provide guidance for checking microphone settings on Windows."""
-        print("\n🔧 Microphone Setup Guide:")
-        print("1. Right-click the speaker icon in your system tray")
-        print("2. Select 'Open Sound settings'")
-        print("3. Under 'Input', make sure the correct microphone is selected")
-        print("4. Click 'Device properties' and ensure the volume is at 70-100%")
-        print("5. Click 'Additional device properties' → 'Levels' tab")
-        print("6. Set microphone level to 70-80 and boost to +10dB if available")
-        print("7. In 'Advanced' tab, try different sample rates (44.1kHz or 48kHz)")
-        print("\n💡 Quick test: Try speaking into your microphone while watching the")
-        print("   input level bar in Windows Sound settings - it should move when you speak.")
-        
+
     def test_microphone(self):
         """Test microphone access and speech services."""
-        print("Testing microphone and speech services...")
-        print("🎤 Make sure your microphone is connected and not muted")
-        print("🔊 Speak clearly and at normal volume")
-        
         try:
-            # Give user more time and clearer instructions
-            print("\n📢 Please say 'Hello Su-Chef' clearly now...")
-            print("(You have 10 seconds to speak)")
+            # Simple, clean instruction
+            print("Say 'Hello Su-Chef' clearly. Listening for 10 seconds...")
             
             # Configure for longer listening time
             result = self.recognizer.recognize_once_async().get()
             
             if result.reason == speechsdk.ResultReason.RecognizedSpeech:
-                print(f"✅ Microphone test successful! Heard: '{result.text}'")
-                print("🎉 Voice recognition is working properly!")
+                print(f"✅ Voice recognition working! Heard: '{result.text}'")
                 return True
             elif result.reason == speechsdk.ResultReason.NoMatch:
-                print("⚠️ Microphone detected but no clear speech recognized.")
-                print("\n🔧 Troubleshooting tips:")
-                print("   • Speak louder and more clearly")
-                print("   • Move closer to your microphone")
-                print("   • Check if your microphone is muted")
-                print("   • Try using a headset microphone")
-                print("   • Make sure no other apps are using the microphone")
-                
-                # Show microphone settings guide
-                self.check_microphone_settings()
-                
-                # Offer a second chance
-                print("\n🔄 Let's try one more time...")
-                print("Say 'Testing one two three' clearly:")
-                
-                result2 = self.recognizer.recognize_once_async().get()
-                if result2.reason == speechsdk.ResultReason.RecognizedSpeech:
-                    print(f"✅ Second test successful! Heard: '{result2.text}'")
-                    return True
-                else:
-                    print("❌ Second test also failed. Voice features will use text fallback.")
-                    return False
+                print("⚠️ No speech recognized. Voice features will use text fallback.")
+                return False
                     
             elif result.reason == speechsdk.ResultReason.Canceled:
-                cancellation_details = result.cancellation_details
-                print(f"❌ Microphone test failed: {cancellation_details.reason}")
-                if cancellation_details.reason == speechsdk.CancellationReason.Error:
-                    print(f"Error details: {cancellation_details.error_details}")
-                    print("\n🔧 Possible solutions:")
-                    print("   • Check your Azure Speech Service key")
-                    print("   • Verify your internet connection")
-                    print("   • Try restarting the application")
+                print("❌ Voice recognition failed. Using text fallback.")
                 return False
                 
         except Exception as e:
-            print(f"❌ Microphone test error: {str(e)}")
-            print("Voice features may not work properly. The system will fall back to text input.")
+            print("❌ Voice recognition error. Using text fallback.")
             return False
         
         return False
@@ -182,7 +144,6 @@ class CookingAgent:
             
     def listen(self) -> Optional[str]:
         """Listen for user input with improved error handling."""
-        print("Speak now...")
         try:
             result = self.recognizer.recognize_once_async().get()
             
@@ -191,7 +152,6 @@ class CookingAgent:
                 print(f"You said: {text}")
                 return text
             elif result.reason == speechsdk.ResultReason.NoMatch:
-                print("No speech could be recognized. Please try again.")
                 return None
             elif result.reason == speechsdk.ResultReason.Canceled:
                 cancellation_details = result.cancellation_details
@@ -215,226 +175,131 @@ class CookingAgent:
         
         return None
 
-    def analyze_question(self, question: str) -> Dict[str, Any]:
-        """Analyze the user's question to determine context and type."""
-        question = question.lower()
-        
-        # Common question patterns
-        patterns = {
-            "how_to": ["how do i", "how to", "what's the best way"],
-            "timing": ["how long", "when is", "until"],
-            "temperature": ["temperature", "hot", "heat", "warm"],
-            "substitute": ["instead of", "substitute", "replace"],
-            "help": ["help", "stuck", "not sure"],
-            "tips": ["tip", "advice", "suggest"],
-            "check": ["ready", "done", "finished", "check"]
-        }
-        
-        # Determine question type
-        q_type = "general"
-        for t, keywords in patterns.items():
-            if any(k in question for k in keywords):
-                q_type = t
-                break
-                
-        return {
-            "type": q_type,
-            "needs_demo": any(w in question for w in ["show", "demonstrate", "example"]),
-            "is_urgent": any(w in question for w in ["help", "quick", "emergency", "burning"]),
-            "step_specific": any(str(i) for i in range(1, len(self.recipe_steps) + 1) if str(i) in question)
-        }
-        
-    def get_ai_response(self, question: str) -> Optional[str]:
-        """Get dynamic AI response based on question analysis."""
-        print(f"🔍 DEBUG: Processing input: '{question}'")
-        
-        # First, let AI determine if this is a session command
+    def classify_intent(self, user_input: str) -> Dict[str, Any]:
+        """Classify user intent using OpenAI for better understanding."""
         try:
             client = openai.OpenAI()
-            command_check_messages = [
-                {
-                    "role": "system", 
-                    "content": "You are analyzing user input to determine if it's a session command or cooking question. Respond with ONLY 'COMMAND' if the user wants to stop/quit/end the session, 'NEXT' if they want to proceed to next step, 'REPEAT' if they want to repeat current step, 'INGREDIENTS' if they want to hear the ingredients list, or 'QUESTION' if it's a cooking-related question."
-                },
-                {"role": "user", "content": f"User said: '{question}'"}
-            ]
             
-            command_response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=command_check_messages,
-                temperature=0.1,
-                max_tokens=10
-            )
-            
-            ai_decision = command_response.choices[0].message.content.strip().upper()
-            print(f"🤖 DEBUG: AI classified as: '{ai_decision}'")
-            
-            # Handle AI's decision
-            if ai_decision == "COMMAND":
-                print("🛑 DEBUG: Stopping session")
-                self.speak("Ending the recipe guide.")
-                self.is_interrupted = True
-                return None
-            elif ai_decision == "NEXT":
-                print(f"➡️ DEBUG: Moving to next step (current: {self.current_step})")
-                self.current_step += 1
-                print(f"➡️ DEBUG: Now at step: {self.current_step}")
-                return None
-            elif ai_decision == "REPEAT":
-                print("🔄 DEBUG: Repeating current step")
-                self.speak_current_step(repeat_step=True)
-                return None
-            elif ai_decision == "INGREDIENTS":
-                print("📝 DEBUG: Speaking ingredients")
-                self.speak_ingredients()
-                return None
-                
-        except Exception as e:
-            print(f"❌ AI Command Check Error: {str(e)}")
-            # Fall through to regular question handling if AI check fails
-        
-        # If it's a question, proceed with context-rich AI response
-        analysis = self.analyze_question(question)
-        current_step = self.recipe_steps[self.current_step]
-        
-        # Update conversation history
-        self.context["last_question"] = question
-        self.context["conversation_history"].append({
-            "step": self.current_step + 1,
-            "question": question,
-            "type": analysis['type']
-        })
-        
-        # Keep only last 5 questions for context
-        if len(self.context["conversation_history"]) > 5:
-            self.context["conversation_history"] = self.context["conversation_history"][-5:]
-        
-        # Build comprehensive context with complete recipe data
-        recent_questions = "\n".join([f"Step {q['step']}: {q['question']} (type: {q['type']})" 
-                                    for q in self.context["conversation_history"][-3:]])
-        
-        # Create complete recipe JSON for AI
-        complete_recipe_data = {
-            "recipe_name": self.recipe_name,
-            "total_steps": len(self.recipe_steps),
-            "current_step_number": self.current_step + 1,
-            "current_step_text": current_step,
-            "all_steps": [{"step_number": i+1, "instruction": step} for i, step in enumerate(self.recipe_steps)],
-            "ingredients": self.recipe_ingredients,
-            "completed_steps": [{"step_number": i+1, "instruction": step} for i, step in enumerate(self.recipe_steps[:self.current_step])],
-            "remaining_steps": [{"step_number": i+1, "instruction": step} for i, step in enumerate(self.recipe_steps[self.current_step+1:], self.current_step+2)],
-            "cooking_progress": f"{self.current_step}/{len(self.recipe_steps)} steps completed",
-            "is_first_step": self.current_step == 0,
-            "is_last_step": self.current_step == len(self.recipe_steps) - 1
-        }
-        
-        context_info = f"""
-COMPLETE RECIPE DATA (JSON):
-{json.dumps(complete_recipe_data, indent=2)}
+            prompt = f"""
+Classify this cooking assistant user input:
+Input: "{user_input}"
+Context: Step {self.current_step + 1} of {len(self.recipe_steps)} - {self.recipe_name}
 
-ORIGINAL RECIPE METADATA:
-{json.dumps(self.original_recipe_data, indent=2)}
+Classify as ONE intent:
+- NAVIGATION: "next", "continue", "move on", "skip" (explicit commands to advance)
+- CLARIFICATION: "what", "how", "why", "explain", "tell me about", "current step" (questions about current step)
+- TIMING: "how long", "when ready", "is it done", "time"
+- SUBSTITUTION: "replace ingredient", "alternative", "substitute"
+- TECHNIQUE: "how to cook", "temperature", "method", "technique"
+- TROUBLESHOOTING: "help", "stuck", "problem", "wrong", "issue"
+- REPEAT: "say again", "repeat", "one more time"
+- INGREDIENTS: "list ingredients", "what ingredients", "ingredients"
+- STOP: "quit", "end", "stop", "exit"
+- QUESTION: other cooking questions
 
-COOKING SESSION STATE:
-- User is currently on step {self.current_step + 1} of {len(self.recipe_steps)}
-- Progress: {((self.current_step) / len(self.recipe_steps) * 100):.1f}% complete
-- Current instruction: "{current_step}"
+IMPORTANT: Questions ABOUT the current step should be CLARIFICATION, not NAVIGATION.
+Only classify as NAVIGATION if explicitly asking to move forward.
 
-RECENT CONVERSATION HISTORY:
-{recent_questions if recent_questions else "- No previous questions in this session"}
-
-CURRENT USER QUESTION: "{question}"
-QUESTION ANALYSIS:
-- Type: {analysis['type']}
-- Urgency: {'HIGH - Safety concern!' if analysis['is_urgent'] else 'Normal'}
-- Needs demonstration: {'Yes' if analysis['needs_demo'] else 'No'}
-- Step-specific: {'Yes' if analysis['step_specific'] else 'No'}
-
-CONTEXT NOTES:
-- User has access to all ingredients listed in the recipe
-- User can ask about any step (past, current, or future)
-- User may need help with techniques, timing, substitutions, or troubleshooting
-- Keep responses practical and specific to their current cooking situation
-- Use original recipe metadata (cooking time, difficulty, etc.) when relevant
+Respond with just the intent name.
 """
-        
-        try:
-            messages = [
-                {
-                    "role": "system", 
-                    "content": """You are Su-Chef, an expert cooking assistant with complete access to the user's recipe data and cooking progress. You have the full recipe JSON, current step, ingredients, and conversation history.
-
-RESPONSE GUIDELINES:
-- Keep responses under 60 words but be specific and helpful
-- Use the complete recipe data to provide accurate, contextual answers
-- Reference specific steps by number when relevant (e.g., "In step 3, you'll need...")
-- Consider what ingredients they have available for substitution questions
-- For timing questions, factor in their current progress and remaining steps
-- If they ask about techniques, be specific to their current ingredient/step
-- Cross-reference previous and upcoming steps for better guidance
-- If they seem confused, offer to repeat or clarify the current step
-- Always be encouraging and supportive
-
-SMART CONTEXT USAGE:
-- Know exactly where they are in the recipe progression
-- Understand what they've already completed
-- Anticipate what's coming next
-- Reference specific ingredients from their list
-- Remember their previous questions in this session
-- Provide step-specific timing and technique advice"""
-                },
-                {"role": "user", "content": context_info}
-            ]
-            
-            print(f"🔍 DEBUG: Sending context to AI (first 500 chars):")
-            print(f"{context_info[:500]}...")
-            print(f"🔍 DEBUG: Current step: {self.current_step + 1}, Total steps: {len(self.recipe_steps)}")
             
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
-                messages=messages,
-                temperature=0.7,
-                max_tokens=80
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.1,
+                max_tokens=20
             )
             
-            ai_response = response.choices[0].message.content
-            print(f"🤖 DEBUG: AI response: {ai_response}")
+            intent = response.choices[0].message.content.strip().upper()
+            return {"intent": intent, "confidence": 0.9}
             
-            return ai_response
         except Exception as e:
-            print(f"❌ AI Error: {str(e)}")
+            print(f"Intent classification failed: {e}")
+            # Fallback to simple matching
+            user_lower = user_input.lower()
+            if any(word in user_lower for word in ['next', 'continue']):
+                return {"intent": "NAVIGATION", "confidence": 0.7}
+            elif any(word in user_lower for word in ['repeat', 'again']):
+                return {"intent": "REPEAT", "confidence": 0.7}
+            else:
+                return {"intent": "QUESTION", "confidence": 0.5}
+
+    def get_ai_response(self, question: str) -> Optional[str]:
+        """Enhanced AI response with intent classification."""
+        
+        # Step 1: Classify intent intelligently
+        intent_data = self.classify_intent(question)
+        intent = intent_data["intent"]
+        
+        # Step 2: Handle intents intelligently
+        if intent == "NAVIGATION":
+            # Check if we're at the final step
+            if self.current_step >= len(self.recipe_steps) - 1:
+                # Complete the recipe and exit the cooking loop
+                self.is_completed = True
+                self.is_interrupted = True
+                return "Perfect! Recipe completed! Great job cooking!"
+            else:
+                # Move to next step
+                self.current_step += 1
+                # Add proactive intelligence
+                if self.current_step < len(self.recipe_steps):
+                    next_step = self.recipe_steps[self.current_step].lower()
+                    if "heat" in next_step or "temperature" in next_step:
+                        return "Moving to next step. This involves temperature control - be careful!"
+                return None
+            
+        elif intent == "REPEAT":
+            if self.current_step < len(self.recipe_steps):
+                step_text = f"Step {self.current_step + 1}: {self.recipe_steps[self.current_step]}"
+                print(f"\n{step_text}")
+                self.speak(step_text)
+                print("Say 'next' when ready, or ask a question...")
             return None
             
-    def process_command(self, command: str) -> str:
-        """Process navigation and help commands."""
-        if not command:
-            return "CONTINUE"
-            
-        command = command.lower()
-        
-        # Navigation commands
-        if any(word in command for word in ["next", "continue", "go ahead"]):
-            self.current_step += 1
-            return "NEXT"
-        elif any(word in command for word in ["stop", "quit", "exit", "end"]):
+        elif intent == "STOP":
             self.speak("Ending the recipe guide.")
             self.is_interrupted = True
-            return "STOP"
-        elif any(word in command for word in ["repeat", "again"]):
-            self.speak_current_step(repeat_step=True)
-            return "CONTINUE"
-        
-        # Help commands
-        if any(word in command for word in ["tip", "help", "advice"]):
-            tips = self.get_ai_response(f"What are the key tips for: {self.recipe_steps[self.current_step]}")
-            if tips:
-                print("\nTips:", tips)
-                self.speak(tips)
-                print("\nSay 'next' when ready, or ask another question.")
-            return "CONTINUE"
+            return None
             
-        # If it's not a recognized command, treat it as a question
-        return "QUESTION"
+        elif intent == "INGREDIENTS":
+            self.speak_ingredients()
+            return None
+        
+        # Step 3: Enhanced context for complex questions
+        try:
+            client = openai.OpenAI()
+            
+            # Build comprehensive rich context
+            rich_context = self.build_rich_context(question, intent)
+            
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are an intelligent cooking assistant with context awareness. Provide smart, practical cooking advice."},
+                    {"role": "user", "content": rich_context}
+                ],
+                temperature=0.7,
+                max_tokens=60
+            )
+            
+            base_response = response.choices[0].message.content.strip()
+            
+            # LEARNING: Personalize response based on user model
+            personalized_response = self.get_personalized_response(base_response, intent)
+            
+            # LEARNING: Learn from this interaction
+            self.learn_from_interaction(question, intent, personalized_response)
+            
+            # Add instruction for continuing after questions
+            if intent not in ["NAVIGATION", "REPEAT", "STOP", "INGREDIENTS"]:
+                personalized_response += " Say 'Next' to continue cooking, or ask another question if you're still unsure."
+            
+            return personalized_response
+            
+        except Exception as e:
+            print(f"❌ AI Error: {str(e)}")
+            return "I'm having trouble with that question. Could you try rephrasing it?"
             
     def load_recipe(self, filename: str = None) -> bool:
         """Load recipe steps from JSON file. Handles multiple formats."""
@@ -469,7 +334,6 @@ SMART CONTEXT USAGE:
                         self.recipe_steps = recipe_data["instructions"]
                         self.recipe_name = recipe_data.get("name", "Unknown Recipe")
                         self.recipe_ingredients = recipe_data.get("ingredients", [])
-                        print(f"Loaded recipe: {self.recipe_name}")
                         return True
                         
             except FileNotFoundError:
@@ -491,14 +355,7 @@ SMART CONTEXT USAGE:
             # If no companion file, ingredients will remain empty
             self.recipe_ingredients = []
             
-    def speak_current_step(self, repeat_step=True):
-        """Speak the current recipe step."""
-        if 0 <= self.current_step < len(self.recipe_steps):
-            if repeat_step:
-                step_text = f"Step {self.current_step + 1}: {self.recipe_steps[self.current_step]}"
-                print(f"\n{step_text}")
-                self.speak(step_text)
-            print("\nSay 'help' or 'tips' if you need guidance.")
+
     
     def speak_ingredients(self):
         """Speak the recipe ingredients list."""
@@ -520,69 +377,284 @@ SMART CONTEXT USAGE:
         print("\nSay 'next' to continue with the recipe, or ask another question.")
                 
     def run(self):
-        """Main interaction loop with improved voice handling."""
+        """Simple interaction loop for voice-guided cooking."""
         if not self.load_recipe():
             return
+        
+        # LEARNING: Initialize session tracking
+        from datetime import datetime
+        self.session_start_time = datetime.now()
             
-        print(f"\nStarting cooking assistant for: {self.recipe_name}")
-        self.speak(f"Hi, I'm Su-Chef, your cooking assistant! I'll guide you step by step through {self.recipe_name}. You can say 'next' to move to the next step, 'repeat' to hear something again, 'ingredients' to hear the ingredients list, 'help' if you need tips, or 'stop' to end our session. Or ask me any question.")
+        print(f"\n🍳 Starting cooking guide for: {self.recipe_name}")
+        self.speak(f"Hi! I'm Su-Chef, your cooking assistant for {self.recipe_name}. Say 'next' to continue, 'repeat' to hear again, 'ingredients' for the ingredient list, or ask any cooking question.")
+        
+        # Speak the first step
+        step_spoken = False
+        just_repeated = False
         
         while not self.is_interrupted and self.current_step < len(self.recipe_steps):
-            self.speak_current_step(repeat_step=True)
+            # Speak current step only if not already spoken
+            if not step_spoken:
+                step_text = f"Step {self.current_step + 1}: {self.recipe_steps[self.current_step]}"
+                print(f"\n{step_text}")
+                self.speak(step_text)
+                print("Say 'next' when ready, or ask a question...")
+                step_spoken = True
             
-            retry_count = 0
-            max_retries = 3
-            step_at_start = self.current_step  # Track the step we started with
+            # Get user input (voice or text fallback)
+            user_input = self.listen()
             
-            while not self.is_interrupted and retry_count < max_retries and self.current_step == step_at_start:
-                print("\nListening for your command or question...")
-                print("(If voice isn't working, the system will prompt for text input)")
+            if not user_input:
+                # Simple fallback to text
+                print("Voice not detected. Type your command:")
+                try:
+                    user_input = input("> ").strip() or "next"
+                except KeyboardInterrupt:
+                    break
+            
+            if user_input:
+                # Check if this is a repeat command
+                intent_data = self.classify_intent(user_input)
+                intent = intent_data["intent"]
                 
-                user_input = self.listen()
-                
-                if not user_input:
-                    retry_count += 1
-                    if retry_count < max_retries:
-                        print(f"No input detected. Retry {retry_count}/{max_retries}")
-                        print("Try speaking louder or closer to the microphone...")
-                    else:
-                        print("Voice detection failed. Continuing with text input only.")
-                        print("Type 'next' to continue, 'stop' to quit, or ask a question:")
-                        try:
-                            user_input = input("> ").strip()
-                            if not user_input:
-                                user_input = "next"  # Default action
-                        except KeyboardInterrupt:
-                            self.is_interrupted = True
-                            break
-                    
-                if user_input:
-                    # Reset retry count on successful input
-                    retry_count = 0
-                    
-                    # Let AI handle all input - commands and questions
-                    response = self.get_ai_response(user_input)
-                    if response:
-                        print("\nAssistant:", response)
-                        self.speak(response)
-                    
-                    # The loop will automatically break if current_step changed (next command)
-                    # or if we've reached the end or been interrupted
-                        
+                # Process the input
+                response = self.get_ai_response(user_input)
+                if response:
+                    print(f"\nAssistant: {response}")
+                    self.speak(response)
+                    # Don't repeat step automatically - wait for explicit "next"
+                elif intent == "REPEAT":
+                    # Step was just repeated, don't speak it again
+                    just_repeated = True
+                else:
+                    # If response is None and not repeat, it means navigation happened
+                    step_spoken = False  # Need to speak the new step
+                    just_repeated = False
+        
         if not self.is_interrupted:
-            print("\nRecipe completed!")
-            self.speak("All done! Great job!")
+            print("\n🎉 Recipe completed!")
+            self.speak("All done! Great job cooking!")
+    
+    def _show_learning_summary(self):
+        """Enhanced learning summary with comprehensive insights."""
+        print(f"\n🧠 Enhanced Learning Summary:")
+        
+        # Basic metrics
+        print(f"• Your cooking pace: {self.user_model['cooking_pace']}")
+        print(f"• Total questions asked: {len(self.user_model['session_questions'])}")
+        
+        # Skill level analysis
+        total_skill_questions = sum(self.user_model["skill_indicators"].values())
+        skill_level = "beginner" if total_skill_questions > 8 else "intermediate" if total_skill_questions > 3 else "experienced"
+        print(f"• Estimated skill level: {skill_level}")
+        
+        # Question patterns
+        if self.user_model["question_patterns"]:
+            most_common = max(self.user_model["question_patterns"], key=self.user_model["question_patterns"].get)
+            print(f"• Most common question type: {most_common}")
+        
+        # Interaction patterns
+        if self.user_model["interaction_patterns"]["detailed_questions"] > 5:
+            print("• You ask detailed questions - shows good attention to detail!")
+        if self.user_model["interaction_patterns"]["quick_navigation"] > 8:
+            print("• You navigate quickly through steps - confident cooking!")
+        if self.user_model["interaction_patterns"]["repeat_requests"] > 2:
+            print("• You requested several repeats - I'll speak more clearly next time")
+        
+        # Confusion analysis
+        confusion_level = "High" if self.user_model['confusion_count'] > 3 else "Medium" if self.user_model['confusion_count'] > 1 else "Low"
+        print(f"• Confusion level: {confusion_level}")
+        
+        if self.user_model["common_confusions"]:
+            print(f"• Common confusion areas: {len(self.user_model['common_confusions'])} steps needed clarification")
+        
+        # Skill insights
+        if self.user_model["skill_indicators"]["technique_questions"] > 3:
+            print("• You're learning cooking techniques - great for skill building!")
+        if self.user_model["skill_indicators"]["timing_questions"] > 2:
+            print("• You're focused on timing - shows precision cooking!")
+        if self.user_model["skill_indicators"]["equipment_questions"] > 2:
+            print("• You asked about equipment - building your kitchen knowledge!")
+        
+        print("\n🎯 I'll use these insights to provide better guidance next time!")
+        print("🚀 Keep cooking and learning - you're doing great!")
 
-def main():
-    print("Starting Su-Chef Cooking Agent...")
-    try:
-        agent = CookingAgent()
-        print("Agent initialized successfully!")
-        agent.run()
-    except Exception as e:
-        print(f"Error starting agent: {e}")
-        import traceback
-        traceback.print_exc()
+    def learn_from_interaction(self, user_input: str, intent: str, ai_response: str):
+        """Enhanced learning from user interactions to improve future responses."""
+        
+        # Track question patterns
+        if intent in self.user_model["question_patterns"]:
+            self.user_model["question_patterns"][intent] += 1
+        else:
+            self.user_model["question_patterns"][intent] = 1
+        
+        # Enhanced confusion tracking
+        if intent in ["CLARIFICATION", "REPEAT", "TROUBLESHOOTING"]:
+            self.user_model["confusion_count"] += 1
+            # Track what specifically confuses the user
+            if intent == "CLARIFICATION":
+                self.user_model["common_confusions"].append({
+                    "step": self.current_step,
+                    "question": user_input,
+                    "step_text": self.recipe_steps[self.current_step] if self.current_step < len(self.recipe_steps) else ""
+                })
+        
+        # Enhanced skill level tracking
+        if intent == "TECHNIQUE":
+            self.user_model["skill_indicators"]["technique_questions"] += 1
+        elif intent == "TIMING":
+            self.user_model["skill_indicators"]["timing_questions"] += 1
+        elif intent == "TROUBLESHOOTING":
+            self.user_model["skill_indicators"]["troubleshooting_questions"] += 1
+        elif intent == "EQUIPMENT":
+            self.user_model["skill_indicators"]["equipment_questions"] += 1
+        
+        # Enhanced interaction pattern tracking
+        if intent == "NAVIGATION":
+            self.user_model["interaction_patterns"]["quick_navigation"] += 1
+            self._update_cooking_pace()
+        elif intent == "REPEAT":
+            self.user_model["interaction_patterns"]["repeat_requests"] += 1
+        elif intent in ["CLARIFICATION", "TECHNIQUE", "TIMING", "TROUBLESHOOTING"]:
+            self.user_model["interaction_patterns"]["detailed_questions"] += 1
+        
+        # Store enhanced session questions for analysis
+        self.user_model["session_questions"].append({
+            "input": user_input,
+            "intent": intent,
+            "step": self.current_step,
+            "response": ai_response,
+            "timestamp": len(self.user_model["session_questions"])  # Simple timestamp
+        })
+    
+    def _update_cooking_pace(self):
+        """Enhanced cooking pace analysis based on multiple indicators."""
+        navigation_count = self.user_model["question_patterns"].get("NAVIGATION", 0)
+        total_questions = sum(self.user_model["question_patterns"].values())
+        
+        if total_questions > 3:  # Need some data
+            navigation_ratio = navigation_count / total_questions
+            detailed_questions = self.user_model["interaction_patterns"]["detailed_questions"]
+            repeat_requests = self.user_model["interaction_patterns"]["repeat_requests"]
+            
+            # Multi-factor pace analysis
+            if navigation_ratio > 0.6 and detailed_questions < 3:  # Mostly navigation, few questions
+                self.user_model["cooking_pace"] = "fast"
+            elif navigation_ratio < 0.4 or detailed_questions > 5 or repeat_requests > 2:  # Lots of questions/repeats
+                self.user_model["cooking_pace"] = "slow"
+            else:
+                self.user_model["cooking_pace"] = "normal"
+    
+    def get_personalized_response(self, base_response: str, intent: str) -> str:
+        """Enhanced personalization based on comprehensive user model."""
+        
+        # Analyze user skill level
+        total_skill_questions = sum(self.user_model["skill_indicators"].values())
+        skill_level = "beginner" if total_skill_questions > 8 else "intermediate" if total_skill_questions > 3 else "experienced"
+        
+        # Adjust for cooking pace and skill level
+        if self.user_model["cooking_pace"] == "slow":
+            if skill_level == "beginner":
+                return f"{base_response} Take your time - you're learning great!"
+            else:
+                return f"{base_response} No rush, careful cooking is good cooking."
+        elif self.user_model["cooking_pace"] == "fast":
+            if intent == "NAVIGATION":
+                return f"{base_response} Great pace! You're cooking confidently."
+            else:
+                return f"{base_response} You're moving fast - double-check this step."
+        
+        # Adjust for confusion patterns
+        if self.user_model["confusion_count"] > 3:
+            if intent in ["TECHNIQUE", "CLARIFICATION"]:
+                return f"{base_response} I'll explain more clearly next time."
+            else:
+                return f"{base_response} Let me know if anything is unclear."
+        
+        # Adjust for repeat patterns
+        if self.user_model["interaction_patterns"]["repeat_requests"] > 2:
+            return f"{base_response} I'll speak more clearly."
+        
+        # Skill-based adjustments
+        if skill_level == "beginner" and intent in ["TECHNIQUE", "EQUIPMENT"]:
+            return f"{base_response} Don't worry, everyone learns these basics!"
+        elif skill_level == "experienced" and intent == "TECHNIQUE":
+            return f"{base_response} You probably know this, but just to confirm."
+        
+        return base_response
+
+    def build_rich_context(self, question: str, intent: str) -> str:
+        """Build comprehensive context for enhanced AI responses."""
+        
+        # Calculate progress
+        progress_percent = (self.current_step / len(self.recipe_steps)) * 100 if self.recipe_steps else 0
+        
+        # Analyze recent questions and patterns
+        recent_intents = [q["intent"] for q in self.user_model["session_questions"][-3:]]
+        
+        # Predict next steps
+        next_steps = []
+        if self.current_step + 1 < len(self.recipe_steps):
+            next_steps = self.recipe_steps[self.current_step+1:self.current_step+3]
+        
+        # Analyze user skill level
+        total_skill_questions = sum(self.user_model["skill_indicators"].values())
+        skill_level = "beginner" if total_skill_questions > 8 else "intermediate" if total_skill_questions > 3 else "experienced"
+        
+        # Identify confusion patterns
+        confusion_areas = []
+        if self.user_model["common_confusions"]:
+            confusion_areas = [conf["step"] for conf in self.user_model["common_confusions"][-2:]]
+        
+        # Build enhanced rich context
+        rich_context = f"""
+ENHANCED COOKING INTELLIGENCE CONTEXT:
+
+RECIPE STATUS:
+- Recipe: {self.recipe_name}
+- Progress: {self.current_step + 1}/{len(self.recipe_steps)} ({progress_percent:.1f}% complete)
+- Current Step: {self.recipe_steps[self.current_step] if self.current_step < len(self.recipe_steps) else "Complete"}
+- Next Steps Preview: {'; '.join(next_steps[:2]) if next_steps else "Recipe complete"}
+
+ENHANCED USER PROFILE:
+- Cooking Pace: {self.user_model["cooking_pace"]}
+- Estimated Skill Level: {skill_level}
+- Confusion Level: {"High" if self.user_model["confusion_count"] > 3 else "Medium" if self.user_model["confusion_count"] > 1 else "Low"}
+- Recent Question Types: {', '.join(recent_intents) if recent_intents else "None"}
+- Total Questions This Session: {len(self.user_model["session_questions"])}
+
+INTERACTION PATTERNS:
+- Quick Navigation: {self.user_model["interaction_patterns"]["quick_navigation"]}
+- Detailed Questions: {self.user_model["interaction_patterns"]["detailed_questions"]}
+- Repeat Requests: {self.user_model["interaction_patterns"]["repeat_requests"]}
+
+SKILL INDICATORS:
+- Technique Questions: {self.user_model["skill_indicators"]["technique_questions"]}
+- Timing Questions: {self.user_model["skill_indicators"]["timing_questions"]}
+- Equipment Questions: {self.user_model["skill_indicators"]["equipment_questions"]}
+- Troubleshooting Questions: {self.user_model["skill_indicators"]["troubleshooting_questions"]}
+
+CURRENT INTERACTION:
+- User Intent: {intent}
+- Question: "{question}"
+- Available Ingredients: {', '.join(self.recipe_ingredients) if self.recipe_ingredients else "Not specified"}
+- Previous Confusion Steps: {confusion_areas if confusion_areas else "None"}
+
+INTELLIGENT RESPONSE REQUIREMENTS:
+- Provide context-aware, personalized advice based on skill level
+- Consider user's cooking pace, confusion patterns, and interaction style
+- Reference specific steps, ingredients, timing, and techniques
+- Anticipate potential issues based on next steps and user patterns
+- Be proactive, encouraging, and adaptive to user's learning style
+- Keep response practical and under 50 words
+- Match response complexity to user's skill level
+
+Generate enhanced intelligent cooking assistance:
+"""
+        return rich_context
 
 if __name__ == "__main__":
-    main() 
+    # This file is now used as a module only
+    # Main functionality moved to su_chef.py
+    print("This module should be imported, not run directly.")
+    print("Run 'python su_chef.py' instead.") 
