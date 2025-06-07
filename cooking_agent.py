@@ -266,36 +266,40 @@ Respond with just the intent name.
             self.speak_ingredients()
             return None
         
-        # Step 3: Enhanced context for complex questions
+        # Step 3: Generate focused response to user's specific question
         try:
             client = openai.OpenAI()
             
-            # Build comprehensive rich context
-            rich_context = self.build_rich_context(question, intent)
+            # Build minimal, focused context for the specific question
+            current_step_text = self.recipe_steps[self.current_step] if self.current_step < len(self.recipe_steps) else "Recipe complete"
+            
+            # Create a focused prompt that only answers the specific question
+            focused_prompt = f"""You are a helpful cooking assistant. Answer ONLY the user's specific question briefly and directly.
+
+Current cooking step: "{current_step_text}"
+Recipe: {self.recipe_name}
+Available ingredients: {', '.join(self.recipe_ingredients) if self.recipe_ingredients else "Not specified"}
+
+User's question: "{question}"
+
+Provide a brief, direct answer to their specific question only. Do not mention next steps, other cooking advice, or instructions to continue unless directly asked. Keep response under 30 words."""
             
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
-                    {"role": "system", "content": "You are an intelligent cooking assistant with context awareness. Provide smart, practical cooking advice."},
-                    {"role": "user", "content": rich_context}
+                    {"role": "system", "content": "You are a helpful cooking assistant. Answer questions briefly and directly without extra information."},
+                    {"role": "user", "content": focused_prompt}
                 ],
-                temperature=0.7,
-                max_tokens=60
+                temperature=0.3,
+                max_tokens=50
             )
             
             base_response = response.choices[0].message.content.strip()
             
-            # LEARNING: Personalize response based on user model
-            personalized_response = self.get_personalized_response(base_response, intent)
+            # LEARNING: Learn from this interaction (simplified)
+            self.learn_from_interaction(question, intent, base_response)
             
-            # LEARNING: Learn from this interaction
-            self.learn_from_interaction(question, intent, personalized_response)
-            
-            # Add instruction for continuing after questions
-            if intent not in ["NAVIGATION", "REPEAT", "STOP", "INGREDIENTS"]:
-                personalized_response += " Say 'Next' to continue cooking, or ask another question if you're still unsure."
-            
-            return personalized_response
+            return base_response
             
         except Exception as e:
             print(f"❌ AI Error: {str(e)}")
@@ -399,6 +403,7 @@ Respond with just the intent name.
                 print(f"\n{step_text}")
                 self.speak(step_text)
                 print("Say 'next' when ready, or ask a question...")
+                self.speak("Say 'next' when ready, or ask a question.")
                 step_spoken = True
             
             # Get user input (voice or text fallback)
@@ -422,7 +427,10 @@ Respond with just the intent name.
                 if response:
                     print(f"\nAssistant: {response}")
                     self.speak(response)
-                    # Don't repeat step automatically - wait for explicit "next"
+                    # After answering question, continue listening for next input
+                    print("Say 'next' when ready, or ask another question...")
+                    self.speak("Say 'next' when ready, or ask another question.")
+                    continue  # Continue the loop to get next input
                 elif intent == "REPEAT":
                     # Step was just repeated, don't speak it again
                     just_repeated = True
