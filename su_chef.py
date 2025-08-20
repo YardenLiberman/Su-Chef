@@ -117,13 +117,21 @@ def validate_positive_integer(prompt: str, min_value: int = 1) -> int:
     """Get and validate positive integer input from user."""
     while True:
         try:
-            value = int(input(prompt).strip())
+            user_input = input(prompt).strip()
+            if not user_input:  # Handle empty input
+                print("Please enter a number")
+                continue
+                
+            value = int(user_input)
             if value >= min_value:
                 return value
             else:
                 print(f"Please enter a number >= {min_value}")
         except ValueError:
-            print("Please enter a valid number")
+            print("Please enter a valid number (e.g., 30)")
+        except KeyboardInterrupt:
+            print("\nOperation cancelled by user.")
+            raise
 
 def get_numbered_choice(prompt: str, options: Dict[str, str], max_attempts: int = 3) -> Optional[str]:
     """Get user choice from numbered options with validation."""
@@ -302,28 +310,49 @@ class SuChef:
         load_dotenv()
         
         # Initialize components
-        self.db = RecipeDatabase()
+        try:
+            self.db = RecipeDatabase()
+        except Exception as e:
+            print(f"❌ Failed to initialize database: {e}")
+            raise
+        
         self.voice_agent = None
         self.user_id = None
         self.current_recipe_id = None
         self.temp_recipe_data = None
         
-        # Check API keys
+        # Check API keys with better error handling
         self.openai_key = os.getenv("OPENAI_API_KEY")
         self.speech_key = os.getenv("SPEECH_KEY")
         
-        print(f"OpenAI API available: {bool(self.openai_key)}")
-        print(f"Speech services available: {bool(self.speech_key)}")
-        print("Su-Chef initialized!")
+        # Provide helpful guidance for missing keys
+        if not self.openai_key:
+            print("⚠️  Warning: OPENAI_API_KEY not found. Recipe generation will not work.")
+            print("   Please set OPENAI_API_KEY in your .env file or environment variables.")
+        
+        if not self.speech_key:
+            print("⚠️  Warning: SPEECH_KEY not found. Voice features will not work.")
+            print("   Please set SPEECH_KEY in your .env file or environment variables.")
+        
+        print(f"✅ OpenAI API available: {bool(self.openai_key)}")
+        print(f"✅ Speech services available: {bool(self.speech_key)}")
+        print("🎉 Su-Chef initialized successfully!")
     
     def initialize_voice_agent(self) -> bool:
         """Initialize the voice agent when needed."""
         if not self.voice_agent:
+            if not self.speech_key:
+                print("❌ Cannot initialize voice agent: SPEECH_KEY not configured")
+                print("   Please set SPEECH_KEY in your .env file or environment variables.")
+                return False
+            
             try:
                 self.voice_agent = CookingAgent()
+                print("✅ Voice agent initialized successfully!")
                 return True
             except Exception as e:
-                print(f"Error initializing voice agent: {e}")
+                print(f"❌ Error initializing voice agent: {e}")
+                print("   Voice features will not be available.")
                 return False
         return True
     
@@ -455,6 +484,11 @@ class SuChef:
                     continue
             else:
                 print("❌ Failed to generate recipe.")
+                print("   This might be due to:")
+                print("   - Network connectivity issues")
+                print("   - OpenAI API rate limits")
+                print("   - Invalid API key")
+                
                 if attempt_count < max_attempts:
                     retry = get_user_confirmation("Would you like to try generating another recipe?")
                     if retry:
@@ -745,9 +779,17 @@ def main():
         app = SuChef()
         app.main_menu()
     except KeyboardInterrupt:
-        print("\nGoodbye!")
+        print("\n👋 Goodbye! Thanks for using Su-Chef!")
+    except FileNotFoundError as e:
+        print(f"❌ File not found: {e}")
+        print("   Please check that all required files are present.")
+    except PermissionError as e:
+        print(f"❌ Permission denied: {e}")
+        print("   Please check file permissions and try running as administrator if needed.")
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"❌ Unexpected error: {e}")
+        print("   Please check your configuration and try again.")
+        print("   If the problem persists, please report this issue.")
 
 if __name__ == "__main__":
     main() 

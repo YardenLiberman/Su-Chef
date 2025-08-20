@@ -1,0 +1,16 @@
+# Su-Chef Dependencies
+# Core dependencies
+python-dotenv>=1.0.0
+openai>=1.0.0
+
+# Azure Speech Services
+azure-cognitiveservices-speech>=1.31.0
+
+# Database and utilities
+sqlite3  # Built-in with Python
+typing  # Built-in with Python 3.5+
+
+# Optional: For enhanced functionality
+requests>=2.31.0
+pydantic>=2.0.0  # For data validation
+colorama>=0.4.6  # For colored terminal output (Windows compatibility)

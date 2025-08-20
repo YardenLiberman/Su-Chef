@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Su-Chef Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'cooking-orange': '#FF6B35',
+                        'cooking-red': '#E63946',
+                        'cooking-green': '#2A9D8F',
+                        'cooking-yellow': '#F4A261'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center shadow-lg">
+                            <span class="text-white text-xl">🍳</span>
+                        </div>
+                        <h1 class="text-2xl font-bold text-cooking-orange">Su-Chef</h1>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-700">Welcome, <span id="username" class="font-semibold"></span>!</span>
+                    <a href="/logout" class="text-gray-700 hover:text-cooking-orange px-3 py-2 rounded-md text-sm font-medium">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Welcome Section -->
+        <div class="bg-gradient-to-r from-cooking-orange to-cooking-red text-white rounded-lg p-6 mb-8">
+            <h2 class="text-3xl font-bold mb-2">Ready to Cook Something Amazing?</h2>
+            <p class="text-lg opacity-90">Choose your path and let's create culinary magic together!</p>
+        </div>
+
+        <!-- Main Menu Options -->
+        <div class="grid md:grid-cols-2 gap-8 mb-8">
+            <!-- Recipe Selection -->
+            <div class="bg-white rounded-lg shadow-lg p-6 border-l-4 border-cooking-green">
+                <div class="flex items-center mb-4">
+                    <span class="text-3xl mr-3">📖</span>
+                    <h3 class="text-2xl font-bold text-gray-900">Recipe Selection</h3>
+                </div>
+                <p class="text-gray-600 mb-6">Choose from your saved recipes or discover new ones</p>
+                
+                <div class="space-y-3">
+                    <button onclick="showSavedRecipes()" 
+                            class="w-full bg-cooking-green text-white py-3 px-4 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center">
+                        <span class="mr-2">🍽️</span>
+                        View Saved Recipes
+                    </button>
+                    
+                    <button onclick="showRecipeGenerator()" 
+                            class="w-full bg-cooking-orange text-white py-3 px-4 rounded-lg hover:bg-cooking-red transition-colors flex items-center justify-center">
+                        <span class="mr-2">🤖</span>
+                        Generate New Recipe
+                    </button>
+                    
+                    <button onclick="showManualInput()" 
+                            class="w-full bg-cooking-yellow text-white py-3 px-4 rounded-lg hover:bg-yellow-500 transition-colors flex items-center justify-center">
+                        <span class="mr-2">✏️</span>
+                        Enter Your Recipe
+                    </button>
+                </div>
+            </div>
+
+            <!-- Interactive Cooking -->
+            <div class="bg-white rounded-lg shadow-lg p-6 border-l-4 border-cooking-orange">
+                <div class="flex items-center mb-4">
+                    <span class="text-3xl mr-3">🎤</span>
+                    <h3 class="text-2xl font-bold text-gray-900">Interactive Cooking</h3>
+                </div>
+                <p class="text-gray-600 mb-6">Start cooking with voice guidance and AI assistance</p>
+                
+                <button onclick="startCooking()" 
+                        class="w-full bg-cooking-orange text-white py-3 px-4 rounded-lg hover:bg-cooking-red transition-colors flex items-center justify-center text-lg font-semibold">
+                    <span class="mr-2">🔥</span>
+                    Start Cooking Session
+                </button>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Recent Activity</h3>
+            <div id="recentActivity" class="text-gray-500 text-center py-8">
+                <span class="text-4xl">🍳</span>
+                <p class="mt-2">No cooking sessions yet. Start your first recipe!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recipe Generator Modal -->
+    <div id="recipeGeneratorModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-screen overflow-y-auto">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold text-gray-900">Generate New Recipe</h3>
+                        <button onclick="closeModal('recipeGeneratorModal')" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <form id="recipeGeneratorForm" class="space-y-4">
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Meal Type</label>
+                                <select id="mealType" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-cooking-orange focus:border-cooking-orange">
+                                    <option value="">Select meal type</option>
+                                    <option value="breakfast">Breakfast</option>
+                                    <option value="lunch">Lunch</option>
+                                    <option value="dinner">Dinner</option>
+                                    <option value="snack">Snack</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Cooking Time (minutes)</label>
+                                <input type="number" id="cookingTime" min="10" max="180" value="30" required 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-cooking-orange focus:border-cooking-orange">
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Skill Level</label>
+                                <select id="skillLevel" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-cooking-orange focus:border-cooking-orange">
+                                    <option value="">Select skill level</option>
+                                    <option value="beginner">Beginner</option>
+                                    <option value="intermediate">Intermediate</option>
+                                    <option value="advanced">Advanced</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Dietary Restrictions</label>
+                                <select id="dietaryRestrictions" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-cooking-orange focus:border-cooking-orange">
+                                    <option value="">No restrictions</option>
+                                    <option value="vegetarian">Vegetarian</option>
+                                    <option value="vegan">Vegan</option>
+                                    <option value="gluten-free">Gluten-Free</option>
+                                    <option value="dairy-free">Dairy-Free</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Available Ingredients (Optional)
+                                <span class="text-sm text-gray-500">- Separate with commas</span>
+                            </label>
+                            <input type="text" id="availableIngredients" 
+                                   placeholder="e.g., chicken, rice, tomatoes, garlic"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-cooking-orange focus:border-cooking-orange">
+                        </div>
+                        
+                        <div class="flex space-x-3 pt-4">
+                            <button type="submit" 
+                                    class="flex-1 bg-cooking-orange text-white py-3 px-4 rounded-lg hover:bg-cooking-red transition-colors">
+                                Generate Recipe
+                            </button>
+                            <button type="button" onclick="closeModal('recipeGeneratorModal')" 
+                                    class="flex-1 bg-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-400 transition-colors">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generated Recipe Modal -->
+    <div id="recipeModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-screen overflow-y-auto">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold text-gray-900">Generated Recipe</h3>
+                        <button onclick="closeModal('recipeModal')" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div id="recipeContent" class="space-y-6">
+                        <!-- Recipe content will be populated here -->
+                    </div>
+                    
+                    <div class="flex space-x-3 pt-6 border-t">
+                        <button onclick="saveRecipe()" 
+                                class="flex-1 bg-cooking-green text-white py-3 px-4 rounded-lg hover:bg-green-600 transition-colors">
+                            💾 Save Recipe
+                        </button>
+                        <button onclick="generateAnother()" 
+                                class="flex-1 bg-cooking-orange text-white py-3 px-4 rounded-lg hover:bg-cooking-red transition-colors">
+                            🔄 Generate Another
+                        </button>
+                        <button onclick="startCookingWithRecipe()" 
+                                class="flex-1 bg-cooking-red text-white py-3 px-4 rounded-lg hover:bg-red-700 transition-colors">
+                            🍳 Start Cooking
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentRecipe = null;
+        let currentPreferences = null;
+
+        // Load user data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserData();
+        });
+
+        function loadUserData() {
+            // This would normally fetch from the server
+            // For now, we'll use placeholder data
+            document.getElementById('username').textContent = 'Chef';
+        }
+
+        function showSavedRecipes() {
+            alert('Saved recipes feature coming soon!');
+        }
+
+        function showRecipeGenerator() {
+            document.getElementById('recipeGeneratorModal').classList.remove('hidden');
+        }
+
+        function showManualInput() {
+            alert('Manual recipe input feature coming soon!');
+        }
+
+        function startCooking() {
+            alert('Interactive cooking feature coming soon!');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // Recipe Generator Form
+        document.getElementById('recipeGeneratorForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                meal_type: document.getElementById('mealType').value,
+                cooking_time: parseInt(document.getElementById('cookingTime').value),
+                skill_level: document.getElementById('skillLevel').value,
+                dietary_restrictions: document.getElementById('dietaryRestrictions').value,
+                available_ingredients: document.getElementById('availableIngredients').value
+                    ? document.getElementById('availableIngredients').value.split(',').map(i => i.trim())
+                    : []
+            };
+
+            currentPreferences = formData;
+            
+            try {
+                const response = await fetch('/api/generate_recipe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentRecipe = result.recipe;
+                    displayRecipe(result.recipe);
+                    closeModal('recipeGeneratorModal');
+                    document.getElementById('recipeModal').classList.remove('hidden');
+                } else {
+                    alert('Failed to generate recipe: ' + result.error);
+                }
+            } catch (error) {
+                alert('Network error. Please check your connection.');
+            }
+        });
+
+        function displayRecipe(recipe) {
+            const content = document.getElementById('recipeContent');
+            
+            content.innerHTML = `
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h4 class="text-xl font-semibold text-gray-900 mb-2">${recipe.name}</h4>
+                    <div class="grid md:grid-cols-3 gap-4 text-sm">
+                        <div><span class="font-medium">Meal Type:</span> ${recipe.meal_type}</div>
+                        <div><span class="font-medium">Cooking Time:</span> ${recipe.cooking_time} minutes</div>
+                        <div><span class="font-medium">Skill Level:</span> ${recipe.skill_level}</div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h5 class="text-lg font-semibold text-gray-900 mb-3">Ingredients</h5>
+                    <ul class="list-disc list-inside space-y-1 text-gray-700">
+                        ${recipe.ingredients.map(ingredient => `<li>${ingredient}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                <div>
+                    <h5 class="text-lg font-semibold text-gray-900 mb-3">Instructions</h5>
+                    <ol class="list-decimal list-inside space-y-2 text-gray-700">
+                        ${recipe.steps.map(step => `<li>${step}</li>`).join('')}
+                    </ol>
+                </div>
+                
+                ${recipe.dietary_note ? `
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <h5 class="text-lg font-semibold text-green-900 mb-2">Dietary Information</h5>
+                    <p class="text-green-800">${recipe.dietary_note}</p>
+                </div>
+                ` : ''}
+                
+                ${recipe.ingredients_note ? `
+                <div class="bg-yellow-50 p-4 rounded-lg">
+                    <h5 class="text-lg font-semibold text-yellow-900 mb-2">Ingredients Note</h5>
+                    <p class="text-yellow-800">${recipe.ingredients_note}</p>
+                </div>
+                </div>
+                ` : ''}
+            `;
+        }
+
+        function saveRecipe() {
+            if (!currentRecipe) return;
+            
+            // This would save to the server
+            alert('Recipe saved successfully!');
+            closeModal('recipeModal');
+        }
+
+        function generateAnother() {
+            if (!currentPreferences) return;
+            
+            // Re-submit the form with the same preferences
+            document.getElementById('mealType').value = currentPreferences.meal_type;
+            document.getElementById('cookingTime').value = currentPreferences.cooking_time;
+            document.getElementById('skillLevel').value = currentPreferences.skill_level;
+            document.getElementById('dietaryRestrictions').value = currentPreferences.dietary_restrictions;
+            document.getElementById('availableIngredients').value = currentPreferences.available_ingredients.join(', ');
+            
+            closeModal('recipeModal');
+            showRecipeGenerator();
+        }
+
+        function startCookingWithRecipe() {
+            if (!currentRecipe) return;
+            
+            alert('Starting cooking session with: ' + currentRecipe.name);
+            closeModal('recipeModal');
+            // This would start the interactive cooking session
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('fixed')) {
+                event.target.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>

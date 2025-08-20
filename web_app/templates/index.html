@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Su-Chef - AI Cooking Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'cooking-orange': '#FF6B35',
+                        'cooking-red': '#E63946',
+                        'cooking-green': '#2A9D8F',
+                        'cooking-yellow': '#F4A261',
+                        'cooking-brown': '#8B4513'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #FF6B35 0%, #E63946 50%, #2A9D8F 100%);
+        }
+        .cooking-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        .bounce-in {
+            animation: bounceIn 1s ease-out;
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center shadow-lg">
+                                <span class="text-white text-2xl">🍳</span>
+                            </div>
+                            <h1 class="text-2xl font-bold text-cooking-orange">Su-Chef</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/login" class="text-gray-700 hover:text-cooking-orange px-3 py-2 rounded-md text-sm font-medium">Login</a>
+                    <a href="/register" class="bg-cooking-orange text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-cooking-red transition-colors">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="gradient-bg text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+            <div class="text-center">
+                <h1 class="text-5xl md:text-6xl font-bold mb-6 bounce-in">
+                    Your AI Cooking Assistant
+                </h1>
+                <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
+                    Experience the future of cooking with AI-powered recipes, voice guidance, and personalized culinary adventures
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="/register" class="bg-white text-cooking-orange px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors">
+                        Start Cooking Today
+                    </a>
+                    <a href="#features" class="border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white hover:text-cooking-orange transition-colors">
+                        Learn More
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div id="features" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Why Choose Su-Chef?</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Discover the perfect blend of artificial intelligence and culinary expertise
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- AI Recipe Generation -->
+                <div class="text-center p-6 rounded-lg hover:shadow-lg transition-shadow">
+                    <div class="w-20 h-20 bg-cooking-green rounded-full flex items-center justify-center mx-auto mb-4 cooking-animation">
+                        <span class="text-3xl">🤖</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">AI Recipe Generation</h3>
+                    <p class="text-gray-600">
+                        Get personalized recipes based on your preferences, available ingredients, and cooking skill level
+                    </p>
+                </div>
+                
+                <!-- Voice Guidance -->
+                <div class="text-center p-6 rounded-lg hover:shadow-lg transition-shadow">
+                    <div class="w-20 h-20 bg-cooking-orange rounded-full flex items-center justify-center mx-auto mb-4 cooking-animation" style="animation-delay: 1s;">
+                        <span class="text-3xl">🎤</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Voice-Guided Cooking</h3>
+                    <p class="text-gray-600">
+                        Step-by-step voice instructions that guide you through every recipe, hands-free
+                    </p>
+                </div>
+                
+                <!-- Smart Learning -->
+                <div class="text-center p-6 rounded-lg hover:shadow-lg transition-shadow">
+                    <div class="w-20 h-20 bg-cooking-yellow rounded-full flex items-center justify-center mx-auto mb-4 cooking-animation" style="animation-delay: 2s;">
+                        <span class="text-3xl">🧠</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Smart Learning</h3>
+                    <p class="text-gray-600">
+                        AI that learns your preferences and adapts recipes to your taste and cooking style
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works Section -->
+    <div class="py-24 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">How It Works</h2>
+                <p class="text-xl text-gray-600">Your journey to becoming a master chef in 4 simple steps</p>
+            </div>
+            
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-cooking-orange rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">1</div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Set Preferences</h3>
+                    <p class="text-gray-600">Tell us about your cooking skills, dietary needs, and favorite cuisines</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-cooking-green rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">2</div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Get Recipes</h3>
+                    <p class="text-gray-600">AI generates personalized recipes based on your preferences and available ingredients</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-cooking-yellow rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">3</div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Cook Together</h3>
+                    <p class="text-gray-600">Follow voice-guided instructions and get real-time cooking assistance</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-cooking-red rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">4</div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Save & Share</h3>
+                    <p class="text-gray-600">Save your favorite recipes and track your cooking progress</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="py-24 bg-cooking-orange">
+        <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-white mb-6">Ready to Transform Your Cooking?</h2>
+            <p class="text-xl text-white mb-8">
+                Join thousands of home chefs who are already using Su-Chef to create amazing meals
+            </p>
+            <a href="/register" class="bg-white text-cooking-orange px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors">
+                Start Your Free Trial
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-2xl font-bold text-cooking-orange mb-4">🍳 Su-Chef</h3>
+                    <p class="text-gray-400">
+                        Your AI-powered cooking companion, making every meal an adventure.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Features</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li>AI Recipe Generation</li>
+                        <li>Voice Guidance</li>
+                        <li>Personalized Learning</li>
+                        <li>Recipe Management</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li>Help Center</li>
+                        <li>Contact Us</li>
+                        <li>FAQ</li>
+                        <li>Community</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Connect</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li>Blog</li>
+                        <li>Social Media</li>
+                        <li>Newsletter</li>
+                        <li>Partners</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 Su-Chef. All rights reserved. Made with ❤️ for food lovers.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Add scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('bounce-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all feature cards
+        document.querySelectorAll('.grid > div').forEach(card => {
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>

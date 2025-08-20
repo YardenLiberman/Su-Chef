@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Su-Chef - Registration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'cooking-orange': '#FF6B35',
+                        'cooking-red': '#E63946',
+                        'cooking-green': '#2A9D8F',
+                        'cooking-yellow': '#F4A261'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="flex-shrink-0">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center shadow-lg">
+                                <span class="text-white text-xl">🍳</span>
+                            </div>
+                            <h1 class="text-2xl font-bold text-cooking-orange">Su-Chef</h1>
+                        </div>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/login" class="text-gray-700 hover:text-cooking-orange px-3 py-2 rounded-md text-sm font-medium">Already have an account? Login</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Registration Form -->
+    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div>
+                <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                    Join Su-Chef Today
+                </h2>
+                <p class="mt-2 text-center text-sm text-gray-600">
+                    Create your account and start your culinary journey
+                </p>
+            </div>
+            
+            <form id="registrationForm" class="mt-8 space-y-6">
+                <!-- Basic Information -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                            <input id="username" name="username" type="text" required 
+                                   class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-cooking-orange focus:border-cooking-orange focus:z-10 sm:text-sm"
+                                   placeholder="Choose a unique username">
+                        </div>
+                        
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                            <input id="email" name="email" type="email" required 
+                                   class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-cooking-orange focus:border-cooking-orange focus:z-10 sm:text-sm"
+                                   placeholder="your.email@example.com">
+                        </div>
+                        
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                            <input id="password" name="password" type="password" required 
+                                   class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-cooking-orange focus:border-cooking-orange focus:z-10 sm:text-sm"
+                                   placeholder="Create a strong password">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cooking Preferences -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">🍳 Cooking Preferences</h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label for="skill_level" class="block text-sm font-medium text-gray-700">Cooking Skill Level</label>
+                            <select id="skill_level" name="skill_level" required 
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cooking-orange focus:border-cooking-orange sm:text-sm">
+                                <option value="">Select your skill level</option>
+                                <option value="beginner">Beginner - Just starting to cook</option>
+                                <option value="intermediate">Intermediate - Comfortable with basic techniques</option>
+                                <option value="advanced">Advanced - Experienced home chef</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="preferred_cooking_time" class="block text-sm font-medium text-gray-700">Preferred Cooking Time (minutes)</label>
+                            <input id="preferred_cooking_time" name="preferred_cooking_time" type="number" min="10" max="180" 
+                                   class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-cooking-orange focus:border-cooking-orange focus:z-10 sm:text-sm"
+                                   placeholder="30" value="30">
+                        </div>
+                        
+                        <div>
+                            <label for="dietary_restrictions" class="block text-sm font-medium text-gray-700">Dietary Restrictions</label>
+                            <select id="dietary_restrictions" name="dietary_restrictions" 
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cooking-orange focus:border-cooking-orange sm:text-sm">
+                                <option value="">No restrictions</option>
+                                <option value="vegetarian">Vegetarian</option>
+                                <option value="vegan">Vegan</option>
+                                <option value="gluten-free">Gluten-Free</option>
+                                <option value="dairy-free">Dairy-Free</option>
+                                <option value="keto">Keto</option>
+                                <option value="paleo">Paleo</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="favorite_cuisine" class="block text-sm font-medium text-gray-700">Favorite Cuisine</label>
+                            <select id="favorite_cuisine" name="favorite_cuisine" 
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cooking-orange focus:border-cooking-orange sm:text-sm">
+                                <option value="">No preference</option>
+                                <option value="italian">Italian</option>
+                                <option value="mexican">Mexican</option>
+                                <option value="asian">Asian</option>
+                                <option value="mediterranean">Mediterranean</option>
+                                <option value="american">American</option>
+                                <option value="indian">Indian</option>
+                                <option value="french">French</option>
+                                <option value="thai">Thai</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div>
+                    <button type="submit" 
+                            class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-cooking-orange hover:bg-cooking-red focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cooking-orange transition-colors">
+                        <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                            <svg class="h-5 w-5 text-cooking-orange group-hover:text-cooking-red" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                            </svg>
+                        </span>
+                        Create Account & Start Cooking
+                    </button>
+                </div>
+
+                <!-- Error/Success Messages -->
+                <div id="message" class="hidden"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('registrationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                skill_level: document.getElementById('skill_level').value,
+                preferred_cooking_time: parseInt(document.getElementById('preferred_cooking_time').value),
+                dietary_restrictions: document.getElementById('dietary_restrictions').value,
+                favorite_cuisine: document.getElementById('favorite_cuisine').value
+            };
+
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage('Account created successfully! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = result.redirect;
+                    }, 1500);
+                } else {
+                    showMessage(result.error || 'Registration failed. Please try again.', 'error');
+                }
+            } catch (error) {
+                showMessage('Network error. Please check your connection.', 'error');
+            }
+        });
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `text-center p-3 rounded-md ${
+                type === 'success' 
+                    ? 'bg-green-100 text-green-800 border border-green-200' 
+                    : 'bg-red-100 text-red-800 border border-red-200'
+            }`;
+            messageDiv.classList.remove('hidden');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                messageDiv.classList.add('hidden');
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

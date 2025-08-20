@@ -1,0 +1,23 @@
+# Su-Chef Web Application Dependencies
+
+# Web Framework
+Flask==2.3.3
+Flask-CORS==4.0.0
+Flask-SQLAlchemy==3.0.5
+Flask-Login==0.6.3
+Flask-WTF==1.1.1
+
+# Database
+SQLAlchemy==2.0.21
+
+# AI & Voice (reusing your existing)
+openai>=1.0.0
+azure-cognitiveservices-speech>=1.31.0
+
+# Utilities
+python-dotenv>=1.0.0
+Werkzeug==2.3.7
+Jinja2==3.1.2
+
+# Development
+python-dotenv>=1.0.0
