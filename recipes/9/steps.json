@@ -1,0 +1,21 @@
+{
+    "recipe_name": "Easy Lemon Garlic Pasta",
+    "steps": [
+        {
+            "step_number": 1,
+            "text": "Cook spaghetti according to package instructions. Drain and set aside."
+        },
+        {
+            "step_number": 2,
+            "text": "In a pan, heat olive oil over medium heat. Add minced garlic and cook until fragrant, about 1 minute."
+        },
+        {
+            "step_number": 3,
+            "text": "Add cooked spaghetti to the pan, along with lemon zest and juice. Toss to combine."
+        },
+        {
+            "step_number": 4,
+            "text": "Stir in Parmesan cheese and season with salt and pepper to taste. Serve hot and enjoy!"
+        }
+    ]
+}

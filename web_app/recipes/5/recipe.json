@@ -1,0 +1,42 @@
+{
+    "name": "",
+    "meal_type": "breakfast",
+    "cooking_time": 30,
+    "skill_level": "beginner",
+    "dietary_restrictions": "",
+    "ingredients": [
+        "**",
+        "1 cup all-purpose flour",
+        "2 tablespoons sugar",
+        "1 tablespoon baking powder",
+        "1/2 teaspoon salt",
+        "1 cup milk",
+        "1 large egg",
+        "2 tablespoons melted butter",
+        "1 teaspoon vanilla extract",
+        "Butter or oil for cooking",
+        "Fresh berries (such as strawberries, blueberries, raspberries) for topping",
+        "Maple syrup for serving"
+    ],
+    "instructions": [
+        "**",
+        "In a large mixing bowl, whisk together the flour, sugar, baking powder, and salt.",
+        "In a separate bowl, beat the egg lightly, then add milk, melted butter, and vanilla extract. Mix well.",
+        "Pour the wet ingredients into the dry ingredients and stir until just combined. Do not overmix; a few lumps are okay.",
+        "Heat a non-stick skillet or griddle over medium heat and add a small amount of butter or oil.",
+        "Pour 1/4 cup of batter onto the skillet for each pancake. Cook until bubbles form on the surface, then flip and cook the other side until golden brown.",
+        "Repeat with the remaining batter, adding more butter or oil to the skillet as needed.",
+        "Serve the fluffy pancakes topped with fresh berries and drizzled with maple syrup. Enjoy your delicious breakfast!"
+    ],
+    "ingredients_json": "[\"**\", \"1 cup all-purpose flour\", \"2 tablespoons sugar\", \"1 tablespoon baking powder\", \"1/2 teaspoon salt\", \"1 cup milk\", \"1 large egg\", \"2 tablespoons melted butter\", \"1 teaspoon vanilla extract\", \"Butter or oil for cooking\", \"Fresh berries (such as strawberries, blueberries, raspberries) for topping\", \"Maple syrup for serving\"]",
+    "steps": [
+        "**",
+        "In a large mixing bowl, whisk together the flour, sugar, baking powder, and salt.",
+        "In a separate bowl, beat the egg lightly, then add milk, melted butter, and vanilla extract. Mix well.",
+        "Pour the wet ingredients into the dry ingredients and stir until just combined. Do not overmix; a few lumps are okay.",
+        "Heat a non-stick skillet or griddle over medium heat and add a small amount of butter or oil.",
+        "Pour 1/4 cup of batter onto the skillet for each pancake. Cook until bubbles form on the surface, then flip and cook the other side until golden brown.",
+        "Repeat with the remaining batter, adding more butter or oil to the skillet as needed.",
+        "Serve the fluffy pancakes topped with fresh berries and drizzled with maple syrup. Enjoy your delicious breakfast!"
+    ]
+}

@@ -1,0 +1,45 @@
+{
+    "recipe_name": "** Easy Breakfast Skillet",
+    "steps": [
+        {
+            "step_number": 1,
+            "text": "**"
+        },
+        {
+            "step_number": 2,
+            "text": "Heat olive oil in a large skillet over medium heat."
+        },
+        {
+            "step_number": 3,
+            "text": "Add the chopped bacon to the skillet and cook until crispy, stirring occasionally."
+        },
+        {
+            "step_number": 4,
+            "text": "Add the diced bell pepper, onion, and minced garlic to the skillet. Cook for about 3-4 minutes until the vegetables are softened."
+        },
+        {
+            "step_number": 5,
+            "text": "Create 4 wells in the vegetable mixture using a spatula."
+        },
+        {
+            "step_number": 6,
+            "text": "Crack an egg into each well. Season the eggs with salt and pepper."
+        },
+        {
+            "step_number": 7,
+            "text": "Cover the skillet with a lid and cook for about 5-7 minutes, or until the egg whites are set but the yolks are still runny."
+        },
+        {
+            "step_number": 8,
+            "text": "Sprinkle the shredded cheddar cheese over the top of the eggs and vegetables. Cover the skillet again and cook for an additional 2-3 minutes until the cheese is melted."
+        },
+        {
+            "step_number": 9,
+            "text": "Remove the skillet from heat and let it sit for a minute before serving."
+        },
+        {
+            "step_number": 10,
+            "text": "Serve the breakfast skillet hot with toast or crusty bread on the side."
+        }
+    ]
+}

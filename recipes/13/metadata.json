@@ -1,0 +1,8 @@
+{
+    "name": "Banana Oatmeal",
+    "meal_type": "breakfast",
+    "cooking_time": 15,
+    "skill_level": "beginner",
+    "dietary_restrictions": "vegan",
+    "total_steps": 5
+}

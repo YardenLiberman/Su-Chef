@@ -1,0 +1,21 @@
+{
+    "recipe_name": "Pesto Chicken Pasta",
+    "steps": [
+        {
+            "step_number": 1,
+            "text": "Cook the pasta according to package instructions. Drain and set aside."
+        },
+        {
+            "step_number": 2,
+            "text": "Season the chicken breasts with salt and pepper. In a large pan, heat olive oil over medium-high heat. Add the chicken breasts and cook for about 5-6 minutes per side until cooked through. Remove from the pan and let rest for a few minutes before slicing."
+        },
+        {
+            "step_number": 3,
+            "text": "In the same pan, add the cooked pasta, pesto, and Parmesan cheese. Stir well to combine and warm through."
+        },
+        {
+            "step_number": 4,
+            "text": "Serve the pesto pasta topped with sliced chicken breasts and cherry tomatoes if desired. Enjoy your delicious lunch!"
+        }
+    ]
+}

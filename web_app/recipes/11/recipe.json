@@ -1,0 +1,40 @@
+{
+    "name": "Fluffy Blueberry Pancakes",
+    "meal_type": "breakfast",
+    "cooking_time": 30,
+    "skill_level": "beginner",
+    "dietary_restrictions": "",
+    "ingredients": [
+        "1 cup all-purpose flour",
+        "2 tbsp sugar",
+        "2 tsp baking powder",
+        "1/2 tsp salt",
+        "1 cup milk",
+        "1 large egg",
+        "2 tbsp melted butter",
+        "1 tsp vanilla extract",
+        "1/2 cup fresh blueberries"
+    ],
+    "instructions": [
+        "In a mixing bowl, combine the flour, sugar, baking powder, and salt. Mix well.",
+        "In a separate bowl, whisk together the milk, egg, melted butter, and vanilla extract.",
+        "Pour the wet ingredients into the dry ingredients and stir until just combined. Do not overmix; the batter may be slightly lumpy.",
+        "Gently fold in the fresh blueberries.",
+        "Heat a non-stick skillet or griddle over medium heat and lightly grease with butter or cooking spray.",
+        "Pour 1/4 cup of batter onto the skillet for each pancake. Cook until bubbles form on the surface, then flip and cook the other side until golden brown.",
+        "Repeat with the remaining batter, adjusting the heat as needed to prevent burning.",
+        "Serve the fluffy blueberry pancakes warm with maple syrup and extra blueberries on top. Enjoy your delicious breakfast!"
+    ],
+    "ingredients_json": "[\"1 cup all-purpose flour\", \"2 tbsp sugar\", \"2 tsp baking powder\", \"1/2 tsp salt\", \"1 cup milk\", \"1 large egg\", \"2 tbsp melted butter\", \"1 tsp vanilla extract\", \"1/2 cup fresh blueberries\"]",
+    "steps": [
+        "In a mixing bowl, combine the flour, sugar, baking powder, and salt. Mix well.",
+        "In a separate bowl, whisk together the milk, egg, melted butter, and vanilla extract.",
+        "Pour the wet ingredients into the dry ingredients and stir until just combined. Do not overmix; the batter may be slightly lumpy.",
+        "Gently fold in the fresh blueberries.",
+        "Heat a non-stick skillet or griddle over medium heat and lightly grease with butter or cooking spray.",
+        "Pour 1/4 cup of batter onto the skillet for each pancake. Cook until bubbles form on the surface, then flip and cook the other side until golden brown.",
+        "Repeat with the remaining batter, adjusting the heat as needed to prevent burning.",
+        "Serve the fluffy blueberry pancakes warm with maple syrup and extra blueberries on top. Enjoy your delicious breakfast!"
+    ],
+    "raw_text": "Recipe Name: Fluffy Blueberry Pancakes\n\nIngredients:\n- 1 cup all-purpose flour\n- 2 tbsp sugar\n- 2 tsp baking powder\n- 1/2 tsp salt\n- 1 cup milk\n- 1 large egg\n- 2 tbsp melted butter\n- 1 tsp vanilla extract\n- 1/2 cup fresh blueberries\n\nInstructions:\n1. In a mixing bowl, combine the flour, sugar, baking powder, and salt. Mix well.\n2. In a separate bowl, whisk together the milk, egg, melted butter, and vanilla extract.\n3. Pour the wet ingredients into the dry ingredients and stir until just combined. Do not overmix; the batter may be slightly lumpy.\n4. Gently fold in the fresh blueberries.\n5. Heat a non-stick skillet or griddle over medium heat and lightly grease with butter or cooking spray.\n6. Pour 1/4 cup of batter onto the skillet for each pancake. Cook until bubbles form on the surface, then flip and cook the other side until golden brown.\n7. Repeat with the remaining batter, adjusting the heat as needed to prevent burning.\n8. Serve the fluffy blueberry pancakes warm with maple syrup and extra blueberries on top. Enjoy your delicious breakfast!"
+}

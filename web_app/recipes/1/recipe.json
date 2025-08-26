@@ -1,0 +1,43 @@
+{
+    "name": "",
+    "meal_type": "breakfast",
+    "cooking_time": 30,
+    "skill_level": "beginner",
+    "dietary_restrictions": "",
+    "ingredients": [
+        "**",
+        "1 cup all-purpose flour",
+        "2 tbsp sugar",
+        "1 tbsp baking powder",
+        "1/2 tsp salt",
+        "1 cup milk",
+        "1 large egg",
+        "2 tbsp melted butter",
+        "1 tsp vanilla extract",
+        "1/2 cup fresh blueberries",
+        "Butter or oil for cooking"
+    ],
+    "instructions": [
+        "**",
+        "In a large mixing bowl, whisk together the flour, sugar, baking powder, and salt.",
+        "In a separate bowl, beat the egg and then mix in the milk, melted butter, and vanilla extract.",
+        "Pour the wet ingredients into the dry ingredients and stir until just combined. Be careful not to overmix; a few lumps are fine.",
+        "Gently fold in the blueberries into the batter.",
+        "Heat a non-stick skillet or griddle over medium heat and lightly grease with butter or oil.",
+        "Pour 1/4 cup of batter onto the skillet for each pancake. Cook until bubbles form on the surface, then flip and cook until golden brown.",
+        "Repeat with the remaining batter.",
+        "Serve the fluffy blueberry pancakes warm with maple syrup or honey. Enjoy your delicious breakfast!"
+    ],
+    "ingredients_json": "[\"**\", \"1 cup all-purpose flour\", \"2 tbsp sugar\", \"1 tbsp baking powder\", \"1/2 tsp salt\", \"1 cup milk\", \"1 large egg\", \"2 tbsp melted butter\", \"1 tsp vanilla extract\", \"1/2 cup fresh blueberries\", \"Butter or oil for cooking\"]",
+    "steps": [
+        "**",
+        "In a large mixing bowl, whisk together the flour, sugar, baking powder, and salt.",
+        "In a separate bowl, beat the egg and then mix in the milk, melted butter, and vanilla extract.",
+        "Pour the wet ingredients into the dry ingredients and stir until just combined. Be careful not to overmix; a few lumps are fine.",
+        "Gently fold in the blueberries into the batter.",
+        "Heat a non-stick skillet or griddle over medium heat and lightly grease with butter or oil.",
+        "Pour 1/4 cup of batter onto the skillet for each pancake. Cook until bubbles form on the surface, then flip and cook until golden brown.",
+        "Repeat with the remaining batter.",
+        "Serve the fluffy blueberry pancakes warm with maple syrup or honey. Enjoy your delicious breakfast!"
+    ]
+}

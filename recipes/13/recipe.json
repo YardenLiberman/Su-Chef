@@ -1,0 +1,29 @@
+{
+    "name": "Banana Oatmeal",
+    "meal_type": "breakfast",
+    "cooking_time": 15,
+    "skill_level": "beginner",
+    "dietary_restrictions": "vegan",
+    "ingredients": [
+        "1 ripe banana",
+        "1/2 cup rolled oats",
+        "1 cup plant-based milk of your choice",
+        "1/2 tsp cinnamon",
+        "Toppings of your choice (such as nuts, seeds, or maple syrup)"
+    ],
+    "instructions": [
+        "In a saucepan, mash the ripe banana with a fork.",
+        "Add the rolled oats, plant-based milk, and cinnamon to the saucepan. Stir well to combine.",
+        "Cook the mixture over medium heat, stirring occasionally, until the oats are cooked and the mixture has thickened (about 5-7 minutes).",
+        "Once the oatmeal is ready, remove from heat and transfer to a bowl.",
+        "Top with your favorite toppings, such as nuts, seeds, or a drizzle of maple syrup. Enjoy your quick and delicious banana oatmeal!"
+    ],
+    "ingredients_json": "[\"1 ripe banana\", \"1/2 cup rolled oats\", \"1 cup plant-based milk of your choice\", \"1/2 tsp cinnamon\", \"Toppings of your choice (such as nuts, seeds, or maple syrup)\"]",
+    "steps": [
+        "In a saucepan, mash the ripe banana with a fork.",
+        "Add the rolled oats, plant-based milk, and cinnamon to the saucepan. Stir well to combine.",
+        "Cook the mixture over medium heat, stirring occasionally, until the oats are cooked and the mixture has thickened (about 5-7 minutes).",
+        "Once the oatmeal is ready, remove from heat and transfer to a bowl.",
+        "Top with your favorite toppings, such as nuts, seeds, or a drizzle of maple syrup. Enjoy your quick and delicious banana oatmeal!"
+    ]
+}

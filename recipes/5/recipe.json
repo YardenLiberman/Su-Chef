@@ -1,0 +1,22 @@
+{
+    "name": "Easy Banana Oat Pancakes",
+    "meal_type": "breakfast",
+    "cooking_time": 20,
+    "skill_level": "beginner",
+    "dietary_restrictions": null,
+    "ingredients": [
+        "1 ripe banana",
+        "1/2 cup rolled oats",
+        "1/4 cup milk (any type)",
+        "1/2 teaspoon cinnamon",
+        "1/2 teaspoon vanilla extract",
+        "1 tablespoon oil (for cooking)"
+    ],
+    "instructions": [
+        "In a blender or food processor, combine the banana, oats, milk, cinnamon, and vanilla extract. Blend until smooth.",
+        "Heat the oil in a non-stick skillet over medium heat.",
+        "Pour small amounts of the pancake batter onto the skillet to form pancakes.",
+        "Cook for about 2-3 minutes on each side until golden brown.",
+        "Serve warm with your favorite toppings such as maple syrup, fresh fruits, or yogurt. Enjoy your delicious and nutritious banana oat pancakes!"
+    ]
+}

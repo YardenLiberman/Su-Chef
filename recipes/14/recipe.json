@@ -1,0 +1,27 @@
+{
+    "name": "Vegan Banana Oatmeal",
+    "meal_type": "breakfast",
+    "cooking_time": 15,
+    "skill_level": "beginner",
+    "dietary_restrictions": "vegan",
+    "ingredients": [
+        "1 ripe banana",
+        "1/2 cup rolled oats",
+        "1 cup plant-based milk (such as almond or soy milk)",
+        "1/2 teaspoon cinnamon",
+        "Maple syrup or agave nectar (optional, for sweetness)"
+    ],
+    "instructions": [
+        "In a saucepan, mash the ripe banana with a fork until smooth.",
+        "Add the rolled oats, plant-based milk, and cinnamon to the saucepan. Stir well to combine.",
+        "Cook the mixture over medium heat, stirring occasionally, for about 5-7 minutes or until the oats are cooked and the mixture has thickened to your desired consistency.",
+        "If desired, drizzle with maple syrup or agave nectar for sweetness before serving. Enjoy your delicious and easy vegan banana oatmeal breakfast!"
+    ],
+    "ingredients_json": "[\"1 ripe banana\", \"1/2 cup rolled oats\", \"1 cup plant-based milk (such as almond or soy milk)\", \"1/2 teaspoon cinnamon\", \"Maple syrup or agave nectar (optional, for sweetness)\"]",
+    "steps": [
+        "In a saucepan, mash the ripe banana with a fork until smooth.",
+        "Add the rolled oats, plant-based milk, and cinnamon to the saucepan. Stir well to combine.",
+        "Cook the mixture over medium heat, stirring occasionally, for about 5-7 minutes or until the oats are cooked and the mixture has thickened to your desired consistency.",
+        "If desired, drizzle with maple syrup or agave nectar for sweetness before serving. Enjoy your delicious and easy vegan banana oatmeal breakfast!"
+    ]
+}

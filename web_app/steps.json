@@ -1,0 +1,77 @@
+{
+  "recipe_name": "Fluffy Pancakes with Mixed Berries",
+  "steps": [
+    {
+      "step_number": 1,
+      "text": [
+        1,
+        "In a large mixing bowl, whisk together the flour, sugar, baking powder, and salt until well combined.",
+        null,
+        null
+      ]
+    },
+    {
+      "step_number": 2,
+      "text": [
+        2,
+        "In a separate bowl, whisk together the milk, egg, melted butter, and vanilla extract.",
+        null,
+        null
+      ]
+    },
+    {
+      "step_number": 3,
+      "text": [
+        3,
+        "Pour the wet ingredients into the dry ingredients and stir until just combined. Do not overmix; it's okay if the batter is slightly lumpy.",
+        null,
+        null
+      ]
+    },
+    {
+      "step_number": 4,
+      "text": [
+        4,
+        "Gently fold in the mixed berries into the pancake batter.",
+        null,
+        null
+      ]
+    },
+    {
+      "step_number": 5,
+      "text": [
+        5,
+        "Heat a non-stick skillet or griddle over medium heat and lightly grease with butter or cooking spray.",
+        null,
+        null
+      ]
+    },
+    {
+      "step_number": 6,
+      "text": [
+        6,
+        "Pour 1/4 cup of batter onto the skillet for each pancake. Cook until bubbles form on the surface, then flip and cook for another 1-2 minutes until golden brown.",
+        null,
+        null
+      ]
+    },
+    {
+      "step_number": 7,
+      "text": [
+        7,
+        "Repeat with the remaining batter, adding more butter or oil to the skillet as needed.",
+        null,
+        null
+      ]
+    },
+    {
+      "step_number": 8,
+      "text": [
+        8,
+        "Serve the fluffy pancakes warm with maple syrup and extra berries on top. Enjoy your delicious breakfast!",
+        null,
+        null
+      ]
+    }
+  ]
+}

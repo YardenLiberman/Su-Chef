@@ -1,0 +1,33 @@
+{
+    "recipe_name": "Fluffy Pancakes with Fresh Berries",
+    "steps": [
+        {
+            "step_number": 1,
+            "text": "In a large mixing bowl, whisk together the flour, sugar, baking powder, baking soda, and salt."
+        },
+        {
+            "step_number": 2,
+            "text": "In a separate bowl, whisk together the buttermilk, egg, and melted butter until well combined."
+        },
+        {
+            "step_number": 3,
+            "text": "Pour the wet ingredients into the dry ingredients and stir until just combined. Be careful not to overmix; a few lumps are okay."
+        },
+        {
+            "step_number": 4,
+            "text": "Heat a non-stick skillet or griddle over medium heat and lightly grease with butter or cooking spray."
+        },
+        {
+            "step_number": 5,
+            "text": "Pour 1/4 cup of batter onto the skillet for each pancake. Cook until bubbles form on the surface of the pancake, then flip and cook for another 1-2 minutes until golden brown."
+        },
+        {
+            "step_number": 6,
+            "text": "Repeat with the remaining batter, keeping the cooked pancakes warm in a low oven while you finish cooking."
+        },
+        {
+            "step_number": 7,
+            "text": "Serve the fluffy pancakes topped with fresh berries and a drizzle of maple syrup. Enjoy your delicious breakfast!"
+        }
+    ]
+}

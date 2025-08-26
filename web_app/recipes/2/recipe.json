@@ -1,0 +1,43 @@
+{
+    "name": "** Easy Breakfast Skillet",
+    "meal_type": "breakfast",
+    "cooking_time": 30,
+    "skill_level": "beginner",
+    "dietary_restrictions": "",
+    "ingredients": [
+        "**",
+        "4 eggs",
+        "1 bell pepper, diced",
+        "1 small onion, diced",
+        "2 cloves garlic, minced",
+        "4 slices of bacon, chopped",
+        "1 cup shredded cheddar cheese",
+        "Salt and pepper to taste",
+        "1 tablespoon olive oil"
+    ],
+    "instructions": [
+        "**",
+        "Heat olive oil in a large skillet over medium heat.",
+        "Add the chopped bacon to the skillet and cook until crispy, stirring occasionally.",
+        "Add the diced bell pepper, onion, and minced garlic to the skillet. Cook for about 3-4 minutes until the vegetables are softened.",
+        "Create 4 wells in the vegetable mixture using a spatula.",
+        "Crack an egg into each well. Season the eggs with salt and pepper.",
+        "Cover the skillet with a lid and cook for about 5-7 minutes, or until the egg whites are set but the yolks are still runny.",
+        "Sprinkle the shredded cheddar cheese over the top of the eggs and vegetables. Cover the skillet again and cook for an additional 2-3 minutes until the cheese is melted.",
+        "Remove the skillet from heat and let it sit for a minute before serving.",
+        "Serve the breakfast skillet hot with toast or crusty bread on the side."
+    ],
+    "ingredients_json": "[\"**\", \"4 eggs\", \"1 bell pepper, diced\", \"1 small onion, diced\", \"2 cloves garlic, minced\", \"4 slices of bacon, chopped\", \"1 cup shredded cheddar cheese\", \"Salt and pepper to taste\", \"1 tablespoon olive oil\"]",
+    "steps": [
+        "**",
+        "Heat olive oil in a large skillet over medium heat.",
+        "Add the chopped bacon to the skillet and cook until crispy, stirring occasionally.",
+        "Add the diced bell pepper, onion, and minced garlic to the skillet. Cook for about 3-4 minutes until the vegetables are softened.",
+        "Create 4 wells in the vegetable mixture using a spatula.",
+        "Crack an egg into each well. Season the eggs with salt and pepper.",
+        "Cover the skillet with a lid and cook for about 5-7 minutes, or until the egg whites are set but the yolks are still runny.",
+        "Sprinkle the shredded cheddar cheese over the top of the eggs and vegetables. Cover the skillet again and cook for an additional 2-3 minutes until the cheese is melted.",
+        "Remove the skillet from heat and let it sit for a minute before serving.",
+        "Serve the breakfast skillet hot with toast or crusty bread on the side."
+    ]
+}

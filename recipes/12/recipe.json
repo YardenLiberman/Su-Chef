@@ -1,0 +1,31 @@
+{
+    "name": "Veggie Hummus Wraps",
+    "meal_type": "snack",
+    "cooking_time": 16,
+    "skill_level": "beginner",
+    "dietary_restrictions": "sugar-free",
+    "ingredients": [
+        "4 whole wheat tortillas",
+        "1 cup hummus",
+        "1 cup chopped mixed vegetables (such as bell peppers, cucumbers, carrots)",
+        "1/2 cup baby spinach leaves",
+        "Salt and pepper to taste"
+    ],
+    "instructions": [
+        "Lay out the tortillas on a clean surface.",
+        "Spread 1/4 cup of hummus on each tortilla, leaving a border around the edges.",
+        "Divide the chopped vegetables and spinach among the tortillas, placing them on top of the hummus.",
+        "Season with salt and pepper to taste.",
+        "Roll up the tortillas tightly, tucking in the sides as you go.",
+        "Slice the wraps into bite-sized pieces and serve. Enjoy your sugar-free veggie hummus wraps!"
+    ],
+    "ingredients_json": "[\"4 whole wheat tortillas\", \"1 cup hummus\", \"1 cup chopped mixed vegetables (such as bell peppers, cucumbers, carrots)\", \"1/2 cup baby spinach leaves\", \"Salt and pepper to taste\"]",
+    "steps": [
+        "Lay out the tortillas on a clean surface.",
+        "Spread 1/4 cup of hummus on each tortilla, leaving a border around the edges.",
+        "Divide the chopped vegetables and spinach among the tortillas, placing them on top of the hummus.",
+        "Season with salt and pepper to taste.",
+        "Roll up the tortillas tightly, tucking in the sides as you go.",
+        "Slice the wraps into bite-sized pieces and serve. Enjoy your sugar-free veggie hummus wraps!"
+    ]
+}

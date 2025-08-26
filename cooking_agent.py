@@ -1,12 +1,13 @@
 import json
 import os
+import time
 from dotenv import load_dotenv
 import azure.cognitiveservices.speech as speechsdk
 import openai
 from typing import Optional, Dict, List, Any
 
 class CookingAgent:
-    def __init__(self):
+    def __init__(self, test_microphone=True):
         # Load environment variables
         load_dotenv()
         
@@ -66,9 +67,9 @@ class CookingAgent:
         self.session_start_time = None
         
         # Initialize speech services
-        self._init_speech_services()
+        self._init_speech_services(test_microphone)
         
-    def _init_speech_services(self):
+    def _init_speech_services(self, test_microphone=True):
         """Initialize Azure speech services."""
         self.speech_config = speechsdk.SpeechConfig(
             subscription=self.speech_key, 
@@ -82,10 +83,15 @@ class CookingAgent:
             speechsdk.SpeechSynthesisOutputFormat.Raw16Khz16BitMonoPcm
         )
         
-        # Improve speech recognition sensitivity
-        self.speech_config.set_property(speechsdk.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs, "8000")
-        self.speech_config.set_property(speechsdk.PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs, "2000")
-        self.speech_config.set_property(speechsdk.PropertyId.Speech_SegmentationSilenceTimeoutMs, "2000")
+        # Improve speech recognition sensitivity and accuracy
+        self.speech_config.set_property(speechsdk.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs, "10000")  # Wait longer for speech
+        self.speech_config.set_property(speechsdk.PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs, "3000")      # Wait longer after speech
+        self.speech_config.set_property(speechsdk.PropertyId.Speech_SegmentationSilenceTimeoutMs, "3000")              # Better segmentation
+        
+        # Enable better recognition features
+        self.speech_config.enable_dictation()  # Better for natural speech
+        self.speech_config.set_property(speechsdk.PropertyId.SpeechServiceResponse_RequestWordLevelTimestamps, "false")
+        self.speech_config.set_property(speechsdk.PropertyId.SpeechServiceResponse_RequestSnr, "false")
         
         # Use default microphone with better configuration
         audio_config = speechsdk.audio.AudioConfig(use_default_microphone=True)
@@ -93,8 +99,9 @@ class CookingAgent:
         self.synthesizer = speechsdk.SpeechSynthesizer(speech_config=self.speech_config)
         self.recognizer = speechsdk.SpeechRecognizer(speech_config=self.speech_config, audio_config=audio_config)
         
-        # Test microphone access
-        self.test_microphone()
+        # Test microphone access only if requested (skip for web app initialization)
+        if test_microphone:
+            self.test_microphone()
         
 
     def test_microphone(self):
@@ -124,22 +131,27 @@ class CookingAgent:
         return False
         
     def speak(self, text: str) -> bool:
-        """Speak text with faster rate."""
+        """Speak text at normal speed with clear pronunciation."""
         if not text:
             return True
             
         ssml_text = f"""<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US">
             <voice name="{self.voice_name}">
-                <prosody rate="+30.00%">
+                <prosody rate="medium" volume="loud">
+                    <break time="300ms"/>
                     {text}
+                    <break time="200ms"/>
                 </prosody>
             </voice>
         </speak>"""
         
         try:
             result = self.synthesizer.speak_ssml_async(ssml_text).get()
+            # Add small delay to ensure audio completes properly
+            time.sleep(0.2)
             return result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted
-        except:
+        except Exception as e:
+            print(f"Speech error: {e}")
             return False
             
     def listen(self) -> Optional[str]:
@@ -324,6 +336,9 @@ Provide a brief, direct answer to their specific question only. Do not mention n
                             self.recipe_name = recipe_data.get("recipe_name", "Unknown Recipe")
                             # Try to load ingredients from companion recipe.json file
                             self._load_ingredients_from_companion_file()
+                            # Reset step counter for new recipe
+                            self.current_step = 0
+                            self.is_completed = False
                             print(f"Loaded recipe: {self.recipe_name}")
                             return True
                         else:
@@ -331,6 +346,9 @@ Provide a brief, direct answer to their specific question only. Do not mention n
                             self.recipe_steps = recipe_data["steps"]
                             self.recipe_name = recipe_data.get("name", "Unknown Recipe")
                             self.recipe_ingredients = recipe_data.get("ingredients", [])
+                            # Reset step counter for new recipe
+                            self.current_step = 0
+                            self.is_completed = False
                             return True
                     
                     # Handle recipe.json format (instructions field)
@@ -338,6 +356,9 @@ Provide a brief, direct answer to their specific question only. Do not mention n
                         self.recipe_steps = recipe_data["instructions"]
                         self.recipe_name = recipe_data.get("name", "Unknown Recipe")
                         self.recipe_ingredients = recipe_data.get("ingredients", [])
+                        # Reset step counter for new recipe
+                        self.current_step = 0
+                        self.is_completed = False
                         return True
                         
             except FileNotFoundError:

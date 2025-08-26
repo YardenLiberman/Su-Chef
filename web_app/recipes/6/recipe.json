@@ -1,0 +1,42 @@
+{
+    "name": "",
+    "meal_type": "breakfast",
+    "cooking_time": 30,
+    "skill_level": "beginner",
+    "dietary_restrictions": "",
+    "ingredients": [
+        "**",
+        "1 cup all-purpose flour",
+        "2 tablespoons sugar",
+        "1 tablespoon baking powder",
+        "1/2 teaspoon salt",
+        "1 cup milk",
+        "1 large egg",
+        "2 tablespoons melted butter",
+        "Fresh berries (such as strawberries, blueberries, raspberries) for topping",
+        "Maple syrup for serving"
+    ],
+    "instructions": [
+        "**",
+        "In a mixing bowl, whisk together the flour, sugar, baking powder, and salt.",
+        "In a separate bowl, beat the egg, then add the milk and melted butter. Mix well.",
+        "Pour the wet ingredients into the dry ingredients and stir until just combined. It's okay if the batter is a bit lumpy.",
+        "Heat a non-stick skillet or griddle over medium heat. Lightly grease with butter or cooking spray.",
+        "Pour a scoop of pancake batter onto the skillet to form a round pancake. Cook until bubbles form on the surface, then flip and cook the other side until golden brown.",
+        "Repeat with the remaining batter, adjusting the heat if needed to prevent burning.",
+        "Serve the fluffy pancakes hot, topped with fresh berries and a drizzle of maple syrup.",
+        "Enjoy your delicious and easy homemade breakfast!"
+    ],
+    "ingredients_json": "[\"**\", \"1 cup all-purpose flour\", \"2 tablespoons sugar\", \"1 tablespoon baking powder\", \"1/2 teaspoon salt\", \"1 cup milk\", \"1 large egg\", \"2 tablespoons melted butter\", \"Fresh berries (such as strawberries, blueberries, raspberries) for topping\", \"Maple syrup for serving\"]",
+    "steps": [
+        "**",
+        "In a mixing bowl, whisk together the flour, sugar, baking powder, and salt.",
+        "In a separate bowl, beat the egg, then add the milk and melted butter. Mix well.",
+        "Pour the wet ingredients into the dry ingredients and stir until just combined. It's okay if the batter is a bit lumpy.",
+        "Heat a non-stick skillet or griddle over medium heat. Lightly grease with butter or cooking spray.",
+        "Pour a scoop of pancake batter onto the skillet to form a round pancake. Cook until bubbles form on the surface, then flip and cook the other side until golden brown.",
+        "Repeat with the remaining batter, adjusting the heat if needed to prevent burning.",
+        "Serve the fluffy pancakes hot, topped with fresh berries and a drizzle of maple syrup.",
+        "Enjoy your delicious and easy homemade breakfast!"
+    ]
+}

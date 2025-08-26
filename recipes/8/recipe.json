@@ -1,0 +1,22 @@
+{
+    "name": "Avocado Toast with Poached Egg",
+    "meal_type": "breakfast",
+    "cooking_time": 9,
+    "skill_level": "advanced",
+    "dietary_restrictions": null,
+    "ingredients": [
+        "2 slices of whole grain bread",
+        "1 ripe avocado",
+        "2 eggs",
+        "Salt and pepper to taste"
+    ],
+    "instructions": [
+        "Toast the bread slices until they are golden brown and crispy.",
+        "While the bread is toasting, mash the ripe avocado in a bowl and season with salt and pepper.",
+        "Fill a small saucepan with water and bring it to a simmer. Crack the eggs, one at a time, into a small bowl and gently slide them into the simmering water. Poach the eggs for about 3-4 minutes for a soft yolk.",
+        "Spread the mashed avocado onto the toasted bread slices.",
+        "Using a slotted spoon, carefully remove the poached eggs from the water and place one on top of each avocado toast.",
+        "Season with additional salt and pepper, and add any optional toppings if desired.",
+        "Serve the avocado toast with poached egg immediately. Enjoy!"
+    ]
+}

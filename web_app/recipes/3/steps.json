@@ -1,0 +1,33 @@
+{
+    "recipe_name": "",
+    "steps": [
+        {
+            "step_number": 1,
+            "text": "In a mixing bowl, whisk together the flour, sugar, baking powder, and salt."
+        },
+        {
+            "step_number": 2,
+            "text": "In a separate bowl, beat the egg and then stir in the milk and melted butter."
+        },
+        {
+            "step_number": 3,
+            "text": "Pour the wet ingredients into the dry ingredients and mix until just combined. Do not overmix; it's okay if the batter is a bit lumpy."
+        },
+        {
+            "step_number": 4,
+            "text": "Heat a non-stick skillet or griddle over medium heat."
+        },
+        {
+            "step_number": 5,
+            "text": "Scoop 1/4 cup of batter onto the skillet for each pancake. Cook until bubbles form on the surface, then flip and cook for another 1-2 minutes until golden brown."
+        },
+        {
+            "step_number": 6,
+            "text": "Repeat with the remaining batter."
+        },
+        {
+            "step_number": 7,
+            "text": "Serve the pancakes topped with fresh berries and drizzle with maple syrup."
+        }
+    ]
+}

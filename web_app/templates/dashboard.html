@@ -80,19 +80,17 @@
                 </div>
             </div>
 
-            <!-- Interactive Cooking -->
+            <!-- Quick Tips -->
             <div class="bg-white rounded-lg shadow-lg p-6 border-l-4 border-cooking-orange">
                 <div class="flex items-center mb-4">
-                    <span class="text-3xl mr-3">🎤</span>
-                    <h3 class="text-2xl font-bold text-gray-900">Interactive Cooking</h3>
+                    <span class="text-3xl mr-3">💡</span>
+                    <h3 class="text-2xl font-bold text-gray-900">How to Start Cooking</h3>
                 </div>
-                <p class="text-gray-600 mb-6">Start cooking with voice guidance and AI assistance</p>
-                
-                <button onclick="startCooking()" 
-                        class="w-full bg-cooking-orange text-white py-3 px-4 rounded-lg hover:bg-cooking-red transition-colors flex items-center justify-center text-lg font-semibold">
-                    <span class="mr-2">🔥</span>
-                    Start Cooking Session
-                </button>
+                <div class="text-gray-600 space-y-2">
+                    <p><strong>1.</strong> Create a new recipe or select a saved recipe</p>
+                    <p><strong>2.</strong> Click "🍳 Start Cooking" on the recipe you want to make</p>
+                    <p><strong>3.</strong> Use voice commands: "next", "repeat", "ingredients"</p>
+                </div>
             </div>
         </div>
 
@@ -241,8 +239,148 @@
             document.getElementById('username').textContent = 'Chef';
         }
 
-        function showSavedRecipes() {
-            alert('Saved recipes feature coming soon!');
+        async function showSavedRecipes() {
+            // Show loading state
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.innerHTML = '⏳ Loading...';
+            button.disabled = true;
+            
+            try {
+                const response = await fetch('/api/get_saved_recipes');
+                const data = await response.json();
+                
+                if (data.success) {
+                    displaySavedRecipes(data.recipes);
+                } else {
+                    alert('Failed to load saved recipes: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error loading saved recipes: ' + error.message);
+            } finally {
+                // Restore button state
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        }
+        
+        function displaySavedRecipes(recipes) {
+            let html = `
+                <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-96 overflow-y-auto">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold">Your Saved Recipes</h3>
+                            <button onclick="closeSavedRecipes()" class="text-gray-500 hover:text-gray-700">
+                                <span class="text-2xl">&times;</span>
+                            </button>
+                        </div>
+                        <div class="grid gap-4">
+            `;
+            
+            if (recipes.length === 0) {
+                html += '<p class="text-gray-500 text-center py-8">No saved recipes yet. Generate your first recipe!</p>';
+            } else {
+                recipes.forEach(recipe => {
+                    html += `
+                        <div class="border rounded-lg p-4 hover:bg-gray-50">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-semibold text-lg">${recipe.name}</h4>
+                                    <p class="text-gray-600">
+                                        ${recipe.recipe_data.meal_type || 'Unknown'} • 
+                                        ${recipe.recipe_data.cooking_time || 'Unknown'} min • 
+                                        ${recipe.recipe_data.skill_level || 'Unknown'}
+                                    </p>
+                                    ${recipe.created_at ? `<p class="text-sm text-gray-400">Created: ${new Date(recipe.created_at).toLocaleDateString()}</p>` : ''}
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button onclick="startCookingFromSaved('${recipe.id}')" 
+                                            class="bg-cooking-orange text-white px-3 py-1 rounded text-sm hover:bg-cooking-red">
+                                        Start Cooking
+                                    </button>
+                                    <button onclick="viewRecipeDetails('${recipe.id}')" 
+                                            class="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600">
+                                        View Details
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            html += `
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', html);
+        }
+        
+        function closeSavedRecipes() {
+            const modal = document.querySelector('.fixed.inset-0.bg-black.bg-opacity-50');
+            if (modal) {
+                modal.remove();
+            }
+        }
+        
+        async function startCookingFromSaved(recipeId) {
+            try {
+                // First, we need to get the recipe data
+                const response = await fetch('/api/get_saved_recipes');
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Find the specific recipe
+                    const recipe = data.recipes.find(r => r.id === recipeId);
+                    if (!recipe) {
+                        alert('Recipe not found!');
+                        return;
+                    }
+                    
+                    // Close the saved recipes modal
+                    closeSavedRecipes();
+                    
+                    // Start voice guidance with this recipe
+                    const guidanceResponse = await fetch('/api/voice/guidance', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            recipe: {
+                                name: recipe.name,
+                                steps: recipe.recipe_data.steps || [
+                                    "Step 1: Prepare ingredients",
+                                    "Step 2: Follow cooking instructions",
+                                    "Step 3: Serve and enjoy!"
+                                ],
+                                ingredients: recipe.recipe_data.ingredients || []
+                            }
+                        })
+                    });
+                    
+                    const guidanceData = await guidanceResponse.json();
+                    
+                    if (guidanceData.success) {
+                        // Show voice controls modal
+                        showVoiceControls();
+                        updateVoiceStatus(`🍳 Started cooking: ${recipe.name}\nSay "next" to begin with the first step!`);
+                    } else {
+                        alert('Failed to start voice guidance: ' + guidanceData.error);
+                    }
+                } else {
+                    alert('Failed to load recipe data: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error starting cooking session: ' + error.message);
+            }
+        }
+        
+        function viewRecipeDetails(recipeId) {
+            alert('Viewing details for recipe: ' + recipeId);
+            // TODO: Show recipe details modal
         }
 
         function showRecipeGenerator() {
@@ -253,8 +391,200 @@
             alert('Manual recipe input feature coming soon!');
         }
 
-        function startCooking() {
-            alert('Interactive cooking feature coming soon!');
+        function showQuickTip() {
+            alert('To start cooking:\n1. Create or select a recipe first\n2. Click "🍳 Start Cooking" on that recipe\n3. Use voice commands during cooking');
+        }
+        
+        function showVoiceControls() {
+            const html = `
+                <div id="voiceControlsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-96 overflow-y-auto">
+                        <h3 class="text-xl font-bold mb-4">🎤 Voice Cooking Session Active</h3>
+                        
+                        <!-- Current Recipe Step Display -->
+                        <div id="currentStepDisplay" class="bg-cooking-orange text-white p-4 rounded-lg mb-4">
+                            <h4 class="font-bold text-lg mb-2">Current Step:</h4>
+                            <p id="currentStepText" class="text-lg">Say "Next" to begin with the first step!</p>
+                            <div id="stepProgress" class="text-sm mt-2 opacity-90"></div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <button onclick="sendVoiceCommand('next')" class="bg-cooking-orange text-white px-4 py-2 rounded hover:bg-cooking-red">
+                                ▶️ Next Step
+                            </button>
+                            <button onclick="sendVoiceCommand('repeat')" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                                🔄 Repeat Step
+                            </button>
+                            <button onclick="sendVoiceCommand('ingredients')" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                                📝 Ingredients
+                            </button>
+                            <button onclick="sendVoiceCommand('help')" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+                                ❓ Help
+                            </button>
+                        </div>
+                        
+                        <div class="border-t pt-4 mb-4">
+                            <p class="text-sm text-gray-500 mb-2">Voice Commands:</p>
+                            <div class="grid grid-cols-2 gap-2 text-sm text-gray-600">
+                                <div>• Say "Next" → Next step</div>
+                                <div>• Say "Repeat" → Repeat step</div>
+                                <div>• Say "Ingredients" → List ingredients</div>
+                                <div>• Say "Help" → More commands</div>
+                            </div>
+                        </div>
+                        
+                        <div id="voiceStatus" class="bg-gray-100 p-3 rounded mb-4 text-sm">
+                            Ready for voice commands...
+                        </div>
+                        
+                        <div class="flex space-x-2">
+                            <button onclick="startListening()" class="bg-cooking-orange text-white px-4 py-2 rounded">
+                                🎤 Listen
+                            </button>
+                            <button onclick="testVoiceSpeak()" class="bg-blue-500 text-white px-4 py-2 rounded">
+                                🔊 Test Voice
+                            </button>
+                            <button onclick="closeVoiceControls()" class="bg-gray-500 text-white px-4 py-2 rounded">
+                                ❌ Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', html);
+        }
+        
+        async function sendVoiceCommand(command) {
+            // Disable all voice buttons during request
+            const voiceButtons = document.querySelectorAll('#voiceControlsModal button');
+            voiceButtons.forEach(btn => btn.disabled = true);
+            
+            try {
+                updateVoiceStatus(`⏳ Processing "${command}"...`);
+                
+                const response = await fetch('/api/voice/interact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        command: command
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    let statusMsg = `✅ Command processed successfully`;
+                    
+                    // Update current step display if step information is available
+                    if (data.step_number && data.total_steps) {
+                        updateCurrentStep(data.message, data.step_number, data.total_steps);
+                        statusMsg += `\n📍 Progress: ${data.step_number}/${data.total_steps} steps`;
+                    } else {
+                        // For non-step commands (ingredients, help)
+                        statusMsg = `✅ ${data.message}`;
+                    }
+                    
+                    updateVoiceStatus(statusMsg);
+                    
+                    if (data.completed) {
+                        updateCurrentStep('🎉 Recipe completed! Enjoy your meal!', data.total_steps || 0, data.total_steps || 0);
+                        updateVoiceStatus('🎉 Recipe completed! Enjoy your meal!');
+                    }
+                } else {
+                    updateVoiceStatus(`❌ Error: ${data.error}`);
+                }
+            } catch (error) {
+                updateVoiceStatus(`❌ Error: ${error.message}`);
+            } finally {
+                // Re-enable all voice buttons
+                voiceButtons.forEach(btn => btn.disabled = false);
+            }
+        }
+        
+        async function startListening() {
+            try {
+                updateVoiceStatus('🎤 Listening... Speak clearly and say a command like "next" or "repeat"');
+                
+                const response = await fetch('/api/voice/listen', {
+                    method: 'GET'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.text) {
+                    const recognizedText = data.text.toLowerCase().trim();
+                    updateVoiceStatus(`🎤 You said: "${data.text}"`);
+                    
+                    // Process common voice commands
+                    if (recognizedText.includes('next')) {
+                        await sendVoiceCommand('next');
+                    } else if (recognizedText.includes('repeat')) {
+                        await sendVoiceCommand('repeat');
+                    } else if (recognizedText.includes('ingredient')) {
+                        await sendVoiceCommand('ingredients');
+                    } else if (recognizedText.includes('help')) {
+                        await sendVoiceCommand('help');
+                    } else {
+                        updateVoiceStatus(`🎤 Command not recognized. Try saying "next", "repeat", "ingredients", or "help"`);
+                    }
+                } else {
+                    updateVoiceStatus('🎤 No speech recognized. Make sure your microphone is working and try again.');
+                }
+            } catch (error) {
+                updateVoiceStatus(`❌ Listening error: ${error.message}`);
+            }
+        }
+        
+        function updateVoiceStatus(message) {
+            const statusElement = document.getElementById('voiceStatus');
+            if (statusElement) {
+                statusElement.textContent = message;
+            }
+        }
+        
+        function updateCurrentStep(stepText, stepNumber, totalSteps) {
+            const stepTextElement = document.getElementById('currentStepText');
+            const stepProgressElement = document.getElementById('stepProgress');
+            
+            if (stepTextElement) {
+                stepTextElement.textContent = stepText;
+            }
+            
+            if (stepProgressElement && stepNumber && totalSteps) {
+                stepProgressElement.textContent = `Step ${stepNumber} of ${totalSteps}`;
+            }
+        }
+        
+        function closeVoiceControls() {
+            const modal = document.querySelector('.fixed.inset-0.bg-black.bg-opacity-50');
+            if (modal) {
+                modal.remove();
+            }
+        }
+        
+        async function testVoiceSpeak() {
+            try {
+                const response = await fetch('/api/voice/speak', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: 'Hello! This is Su-Chef, your voice cooking assistant. I am ready to guide you through cooking!'
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    alert('Voice test successful!');
+                } else {
+                    alert('Voice test failed: ' + data.error);
+                }
+            } catch (error) {
+                alert('Voice test error: ' + error.message);
+            }
         }
 
         function closeModal(modalId) {
@@ -264,6 +594,12 @@
         // Recipe Generator Form
         document.getElementById('recipeGeneratorForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            
+            // Show loading state
+            const submitButton = e.target.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerHTML;
+            submitButton.innerHTML = '⏳ Generating Recipe...';
+            submitButton.disabled = true;
             
             const formData = {
                 meal_type: document.getElementById('mealType').value,
@@ -298,6 +634,10 @@
                 }
             } catch (error) {
                 alert('Network error. Please check your connection.');
+            } finally {
+                // Restore button state
+                submitButton.innerHTML = originalText;
+                submitButton.disabled = false;
             }
         });
 
@@ -367,12 +707,36 @@
             showRecipeGenerator();
         }
 
-        function startCookingWithRecipe() {
-            if (!currentRecipe) return;
+        async function startCookingWithRecipe() {
+            if (!currentRecipe) {
+                alert('No recipe selected');
+                return;
+            }
             
-            alert('Starting cooking session with: ' + currentRecipe.name);
-            closeModal('recipeModal');
-            // This would start the interactive cooking session
+            try {
+                // Start voice guidance with the current recipe
+                const response = await fetch('/api/voice/guidance', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        recipe: currentRecipe
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Voice guidance started for: ' + currentRecipe.name + '\nYou can now use voice commands!');
+                    closeModal('recipeModal');
+                    showVoiceControls();
+                } else {
+                    alert('Failed to start voice guidance: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error starting cooking session: ' + error.message);
+            }
         }
 
         // Close modals when clicking outside

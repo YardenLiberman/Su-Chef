@@ -1,0 +1,41 @@
+{
+    "recipe_name": "** Quick and Easy Breakfast Scramble",
+    "steps": [
+        {
+            "step_number": 1,
+            "text": "**"
+        },
+        {
+            "step_number": 2,
+            "text": "In a bowl, whisk together the eggs and milk until well combined. Season with salt and pepper."
+        },
+        {
+            "step_number": 3,
+            "text": "Heat oil in a non-stick skillet over medium heat."
+        },
+        {
+            "step_number": 4,
+            "text": "Add the diced bell peppers and onions to the skillet and saut\u00e9 for about 2-3 minutes until they start to soften."
+        },
+        {
+            "step_number": 5,
+            "text": "Add the diced tomatoes to the skillet and cook for another 1-2 minutes."
+        },
+        {
+            "step_number": 6,
+            "text": "Pour the egg mixture over the vegetables in the skillet. Let it cook for a minute without stirring."
+        },
+        {
+            "step_number": 7,
+            "text": "Using a spatula, gently stir the eggs and vegetables together, scrambling them until the eggs are cooked to your desired consistency."
+        },
+        {
+            "step_number": 8,
+            "text": "Sprinkle the shredded cheddar cheese over the scrambled eggs and continue to cook for another minute until the cheese is melted."
+        },
+        {
+            "step_number": 9,
+            "text": "Remove the skillet from heat and serve the breakfast scramble hot."
+        }
+    ]
+}

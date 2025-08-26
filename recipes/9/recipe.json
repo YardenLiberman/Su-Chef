@@ -1,0 +1,21 @@
+{
+    "name": "Easy Lemon Garlic Pasta",
+    "meal_type": "dinner",
+    "cooking_time": 30,
+    "skill_level": "beginner",
+    "dietary_restrictions": null,
+    "ingredients": [
+        "8 oz spaghetti",
+        "2 cloves garlic, minced",
+        "1 lemon, zested and juiced",
+        "2 tbsp olive oil",
+        "1/4 cup grated Parmesan cheese",
+        "Salt and pepper to taste"
+    ],
+    "instructions": [
+        "Cook spaghetti according to package instructions. Drain and set aside.",
+        "In a pan, heat olive oil over medium heat. Add minced garlic and cook until fragrant, about 1 minute.",
+        "Add cooked spaghetti to the pan, along with lemon zest and juice. Toss to combine.",
+        "Stir in Parmesan cheese and season with salt and pepper to taste. Serve hot and enjoy!"
+    ]
+}

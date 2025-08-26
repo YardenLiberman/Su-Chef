@@ -1,0 +1,22 @@
+{
+    "name": "Pesto Chicken Pasta",
+    "meal_type": "lunch",
+    "cooking_time": 45,
+    "skill_level": "intermediate",
+    "dietary_restrictions": null,
+    "ingredients": [
+        "8 oz pasta of your choice",
+        "2 boneless, skinless chicken breasts",
+        "Salt and pepper",
+        "2 tbsp olive oil",
+        "1/2 cup store-bought or homemade pesto",
+        "1/4 cup grated Parmesan cheese",
+        "Cherry tomatoes, halved (optional)"
+    ],
+    "instructions": [
+        "Cook the pasta according to package instructions. Drain and set aside.",
+        "Season the chicken breasts with salt and pepper. In a large pan, heat olive oil over medium-high heat. Add the chicken breasts and cook for about 5-6 minutes per side until cooked through. Remove from the pan and let rest for a few minutes before slicing.",
+        "In the same pan, add the cooked pasta, pesto, and Parmesan cheese. Stir well to combine and warm through.",
+        "Serve the pesto pasta topped with sliced chicken breasts and cherry tomatoes if desired. Enjoy your delicious lunch!"
+    ]
+}

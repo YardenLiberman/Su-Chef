@@ -1,0 +1,37 @@
+{
+    "name": "",
+    "meal_type": "breakfast",
+    "cooking_time": 30,
+    "skill_level": "beginner",
+    "dietary_restrictions": "",
+    "ingredients": [
+        "1 cup all-purpose flour",
+        "2 tablespoons sugar",
+        "1 tablespoon baking powder",
+        "1/4 teaspoon salt",
+        "1 cup milk",
+        "1 large egg",
+        "2 tablespoons melted butter",
+        "Fresh berries (such as strawberries, blueberries, raspberries) for topping",
+        "Maple syrup for serving"
+    ],
+    "instructions": [
+        "In a mixing bowl, whisk together the flour, sugar, baking powder, and salt.",
+        "In a separate bowl, beat the egg and then stir in the milk and melted butter.",
+        "Pour the wet ingredients into the dry ingredients and mix until just combined. Do not overmix; it's okay if the batter is a bit lumpy.",
+        "Heat a non-stick skillet or griddle over medium heat.",
+        "Scoop 1/4 cup of batter onto the skillet for each pancake. Cook until bubbles form on the surface, then flip and cook for another 1-2 minutes until golden brown.",
+        "Repeat with the remaining batter.",
+        "Serve the pancakes topped with fresh berries and drizzle with maple syrup."
+    ],
+    "ingredients_json": "[\"1 cup all-purpose flour\", \"2 tablespoons sugar\", \"1 tablespoon baking powder\", \"1/4 teaspoon salt\", \"1 cup milk\", \"1 large egg\", \"2 tablespoons melted butter\", \"Fresh berries (such as strawberries, blueberries, raspberries) for topping\", \"Maple syrup for serving\"]",
+    "steps": [
+        "In a mixing bowl, whisk together the flour, sugar, baking powder, and salt.",
+        "In a separate bowl, beat the egg and then stir in the milk and melted butter.",
+        "Pour the wet ingredients into the dry ingredients and mix until just combined. Do not overmix; it's okay if the batter is a bit lumpy.",
+        "Heat a non-stick skillet or griddle over medium heat.",
+        "Scoop 1/4 cup of batter onto the skillet for each pancake. Cook until bubbles form on the surface, then flip and cook for another 1-2 minutes until golden brown.",
+        "Repeat with the remaining batter.",
+        "Serve the pancakes topped with fresh berries and drizzle with maple syrup."
+    ]
+}

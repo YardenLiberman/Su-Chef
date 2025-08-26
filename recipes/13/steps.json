@@ -1,0 +1,25 @@
+{
+    "recipe_name": "Banana Oatmeal",
+    "steps": [
+        {
+            "step_number": 1,
+            "text": "In a saucepan, mash the ripe banana with a fork."
+        },
+        {
+            "step_number": 2,
+            "text": "Add the rolled oats, plant-based milk, and cinnamon to the saucepan. Stir well to combine."
+        },
+        {
+            "step_number": 3,
+            "text": "Cook the mixture over medium heat, stirring occasionally, until the oats are cooked and the mixture has thickened (about 5-7 minutes)."
+        },
+        {
+            "step_number": 4,
+            "text": "Once the oatmeal is ready, remove from heat and transfer to a bowl."
+        },
+        {
+            "step_number": 5,
+            "text": "Top with your favorite toppings, such as nuts, seeds, or a drizzle of maple syrup. Enjoy your quick and delicious banana oatmeal!"
+        }
+    ]
+}

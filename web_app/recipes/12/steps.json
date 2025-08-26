@@ -1,0 +1,41 @@
+{
+    "recipe_name": "Fluffy Strawberry Pancakes",
+    "steps": [
+        {
+            "step_number": 1,
+            "text": "In a large mixing bowl, combine the flour, sugar, baking powder, and salt."
+        },
+        {
+            "step_number": 2,
+            "text": "In a separate bowl, whisk together the milk, egg, melted butter, and vanilla extract."
+        },
+        {
+            "step_number": 3,
+            "text": "Pour the wet ingredients into the dry ingredients and stir until just combined. Do not overmix; it's okay if the batter is slightly lumpy."
+        },
+        {
+            "step_number": 4,
+            "text": "Gently fold in the sliced strawberries into the batter."
+        },
+        {
+            "step_number": 5,
+            "text": "Heat a non-stick skillet or griddle over medium heat and lightly grease it with butter or cooking spray."
+        },
+        {
+            "step_number": 6,
+            "text": "Pour 1/4 cup of batter onto the skillet for each pancake, spreading it out slightly."
+        },
+        {
+            "step_number": 7,
+            "text": "Cook the pancakes for 2-3 minutes on the first side until bubbles form on the surface, then flip and cook for an additional 1-2 minutes until golden brown."
+        },
+        {
+            "step_number": 8,
+            "text": "Repeat with the remaining batter, adding more butter or oil to the skillet as needed."
+        },
+        {
+            "step_number": 9,
+            "text": "Serve the fluffy strawberry pancakes warm with maple syrup and extra sliced strawberries on top. Enjoy your delicious breakfast!"
+        }
+    ]
+}

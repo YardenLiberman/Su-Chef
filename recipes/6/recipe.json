@@ -1,0 +1,20 @@
+{
+    "name": "Quick and Easy Avocado Toast",
+    "meal_type": "breakfast",
+    "cooking_time": 15,
+    "skill_level": "beginner",
+    "dietary_restrictions": null,
+    "ingredients": [
+        "1 ripe avocado",
+        "2 slices of bread",
+        "Salt and pepper to taste"
+    ],
+    "instructions": [
+        "Toast the bread slices until golden brown.",
+        "While the bread is toasting, cut the avocado in half, remove the pit, and scoop the flesh into a bowl. Mash the avocado with a fork until smooth.",
+        "Spread the mashed avocado evenly onto the toasted bread slices.",
+        "Season with salt and pepper to taste.",
+        "Add any optional toppings you desire, such as sliced cherry tomatoes, crumbled feta cheese, or a sprinkle of red pepper flakes.",
+        "Serve and enjoy your delicious avocado toast!"
+    ]
+}
