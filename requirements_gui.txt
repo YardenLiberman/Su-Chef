@@ -1,0 +1,13 @@
+# Su-Chef GUI Requirements
+# Install with: pip install -r requirements_gui.txt
+
+# GUI Framework
+ttkbootstrap>=1.10.1
+
+# Your existing CLI dependencies (from main requirements.txt)
+openai>=1.0.0
+azure-cognitiveservices-speech>=1.30.0
+python-dotenv>=1.0.0
+
+# Optional: For better subprocess handling
+psutil>=5.9.0
