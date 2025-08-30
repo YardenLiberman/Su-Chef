@@ -1,0 +1,379 @@
+{% extends "base.html" %}
+
+{% block title %}Create Recipe - Su-Chef{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-plus-circle"></i> Create New Recipe</h4>
+            </div>
+            <div class="card-body">
+                <form id="recipeForm">
+                    <!-- Meal Type Selection -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">1. Choose Meal Type</label>
+                        <div class="row">
+                            <div class="col-md-3 mb-2">
+                                <input type="radio" class="btn-check" name="meal_type" id="breakfast" value="breakfast" required>
+                                <label class="btn btn-outline-primary w-100" for="breakfast">
+                                    <i class="fas fa-sun"></i><br>Breakfast
+                                </label>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <input type="radio" class="btn-check" name="meal_type" id="lunch" value="lunch">
+                                <label class="btn btn-outline-primary w-100" for="lunch">
+                                    <i class="fas fa-cloud-sun"></i><br>Lunch
+                                </label>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <input type="radio" class="btn-check" name="meal_type" id="dinner" value="dinner">
+                                <label class="btn btn-outline-primary w-100" for="dinner">
+                                    <i class="fas fa-moon"></i><br>Dinner
+                                </label>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <input type="radio" class="btn-check" name="meal_type" id="snack" value="snack">
+                                <label class="btn btn-outline-primary w-100" for="snack">
+                                    <i class="fas fa-cookie-bite"></i><br>Snack
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cooking Time -->
+                    <div class="mb-4">
+                        <label for="cooking_time" class="form-label fw-bold">2. Maximum Cooking Time (minutes)</label>
+                        <input type="number" class="form-control" id="cooking_time" name="cooking_time" 
+                               min="1" max="300" value="30" required>
+                        <div class="form-text">How much time do you have to cook?</div>
+                    </div>
+
+                    <!-- Skill Level -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">3. Choose Skill Level</label>
+                        <div class="row">
+                            <div class="col-md-4 mb-2">
+                                <input type="radio" class="btn-check" name="skill_level" id="beginner" value="beginner" required>
+                                <label class="btn btn-outline-success w-100" for="beginner">
+                                    <i class="fas fa-seedling"></i><br>Beginner
+                                </label>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <input type="radio" class="btn-check" name="skill_level" id="intermediate" value="intermediate">
+                                <label class="btn btn-outline-success w-100" for="intermediate">
+                                    <i class="fas fa-leaf"></i><br>Intermediate
+                                </label>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <input type="radio" class="btn-check" name="skill_level" id="advanced" value="advanced">
+                                <label class="btn btn-outline-success w-100" for="advanced">
+                                    <i class="fas fa-tree"></i><br>Advanced
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dietary Restrictions -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">4. Dietary Restrictions (Optional)</label>
+                        <div class="row">
+                            <div class="col-md-4 mb-2">
+                                <input type="radio" class="btn-check" name="dietary_restrictions" id="none" value="">
+                                <label class="btn btn-outline-warning w-100" for="none">
+                                    <i class="fas fa-check"></i><br>None
+                                </label>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <input type="radio" class="btn-check" name="dietary_restrictions" id="vegetarian" value="vegetarian">
+                                <label class="btn btn-outline-warning w-100" for="vegetarian">
+                                    <i class="fas fa-carrot"></i><br>Vegetarian
+                                </label>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <input type="radio" class="btn-check" name="dietary_restrictions" id="vegan" value="vegan">
+                                <label class="btn btn-outline-warning w-100" for="vegan">
+                                    <i class="fas fa-seedling"></i><br>Vegan
+                                </label>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <input type="radio" class="btn-check" name="dietary_restrictions" id="kosher" value="kosher">
+                                <label class="btn btn-outline-warning w-100" for="kosher">
+                                    <i class="fas fa-star"></i><br>Kosher
+                                </label>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <input type="radio" class="btn-check" name="dietary_restrictions" id="sugar_free" value="sugar-free">
+                                <label class="btn btn-outline-warning w-100" for="sugar_free">
+                                    <i class="fas fa-ban"></i><br>Sugar-Free
+                                </label>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <input type="radio" class="btn-check" name="dietary_restrictions" id="custom" value="custom">
+                                <label class="btn btn-outline-warning w-100" for="custom">
+                                    <i class="fas fa-edit"></i><br>Custom
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Custom dietary restriction input -->
+                        <div id="customDietaryInput" class="mt-3" style="display: none;">
+                            <input type="text" class="form-control" id="custom_dietary" 
+                                   placeholder="Specify your dietary restriction (e.g., gluten-free, nut allergy)">
+                        </div>
+                    </div>
+
+                    <!-- Available Ingredients -->
+                    <div class="mb-4">
+                        <label for="available_ingredients" class="form-label fw-bold">5. Available Ingredients (Optional)</label>
+                        <textarea class="form-control" id="available_ingredients" name="available_ingredients" 
+                                  rows="3" placeholder="Enter ingredients you have, separated by commas (e.g., chicken, rice, tomatoes)"></textarea>
+                        <div class="form-text">Leave empty if you want to use any ingredients</div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary btn-lg" id="generateBtn">
+                            <i class="fas fa-magic"></i> Generate Recipe
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Loading State -->
+                <div id="loadingState" class="text-center py-5" style="display: none;">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h5>Generating your recipe...</h5>
+                    <p class="text-muted">This may take a few moments</p>
+                </div>
+
+                <!-- Generated Recipe Display -->
+                <div id="recipeDisplay" class="mt-4" style="display: none;">
+                    <div class="card border-success">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="fas fa-utensils"></i> Generated Recipe</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="recipeContent"></div>
+                                                         <div class="text-center mt-3">
+                                 <button class="btn btn-success btn-lg me-2" id="saveRecipeBtn">
+                                     <i class="fas fa-save"></i> Save Recipe
+                                 </button>
+                                 <button class="btn btn-primary btn-lg me-2" id="startCookingBtn">
+                                     <i class="fas fa-fire"></i> Start Cooking
+                                 </button>
+                                 <button class="btn btn-outline-primary btn-lg" id="generateAnotherBtn">
+                                     <i class="fas fa-redo"></i> Generate Another
+                                 </button>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// WebSocket event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Listen for recipe generation events
+    socket.on('recipe_generated', function(data) {
+        if (data.success) {
+            handleRecipeGenerated(data);
+        } else {
+            handleRecipeGenerationFailed(data.error);
+        }
+    });
+});
+
+// Handle custom dietary restriction input
+document.getElementById('custom').addEventListener('change', function() {
+    const customInput = document.getElementById('customDietaryInput');
+    if (this.checked) {
+        customInput.style.display = 'block';
+        document.getElementById('custom_dietary').required = true;
+    } else {
+        customInput.style.display = 'none';
+        document.getElementById('custom_dietary').required = false;
+    }
+});
+
+// Handle form submission
+document.getElementById('recipeForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Validate form
+    const mealType = document.querySelector('input[name="meal_type"]:checked');
+    const skillLevel = document.querySelector('input[name="skill_level"]:checked');
+    
+    if (!mealType || !skillLevel) {
+        alert('Please select both meal type and skill level');
+        return;
+    }
+    
+    // Get form data
+    const formData = {
+        meal_type: mealType.value,
+        cooking_time: parseInt(document.getElementById('cooking_time').value),
+        skill_level: skillLevel.value,
+        dietary_restrictions: getDietaryRestrictions(),
+        available_ingredients: getAvailableIngredients()
+    };
+    
+    // Show loading state
+    document.getElementById('recipeForm').style.display = 'none';
+    document.getElementById('loadingState').style.display = 'block';
+    
+    // Generate recipe
+    generateRecipe(formData);
+});
+
+function getDietaryRestrictions() {
+    const selected = document.querySelector('input[name="dietary_restrictions"]:checked');
+    if (selected && selected.value === 'custom') {
+        return document.getElementById('custom_dietary').value.trim();
+    }
+    return selected ? selected.value : '';
+}
+
+function getAvailableIngredients() {
+    const ingredients = document.getElementById('available_ingredients').value.trim();
+    if (ingredients) {
+        return ingredients.split(',').map(i => i.trim()).filter(i => i);
+    }
+    return [];
+}
+
+// WebSocket recipe generation handlers
+window.handleRecipeGenerated = function(data) {
+    console.log('Recipe generated via WebSocket:', data);
+    document.getElementById('loadingState').style.display = 'none';
+    
+    // Show recipe display
+    document.getElementById('recipeDisplay').style.display = 'block';
+    
+    // Store recipe ID for saving
+    window.generatedRecipeId = data.recipe_id;
+    
+    // Display the full recipe
+    const ingredientsList = data.ingredients.map(ingredient => `<li>${ingredient}</li>`).join('');
+    const stepsList = data.steps.map((step, index) => `<li><strong>Step ${index + 1}:</strong> ${step}</li>`).join('');
+    
+    document.getElementById('recipeContent').innerHTML = `
+        <div class="recipe-details">
+            <h4 class="text-success mb-3">${data.recipe_name}</h4>
+            
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <span class="badge bg-primary me-2"><i class="fas fa-clock"></i> ${data.cooking_time} min</span>
+                </div>
+                <div class="col-md-3">
+                    <span class="badge bg-success me-2"><i class="fas fa-star"></i> ${data.skill_level}</span>
+                </div>
+                <div class="col-md-3">
+                    <span class="badge bg-info me-2"><i class="fas fa-utensils"></i> ${data.meal_type}</span>
+                </div>
+                ${data.dietary_restrictions ? `<div class="col-md-3"><span class="badge bg-warning me-2"><i class="fas fa-leaf"></i> ${data.dietary_restrictions}</span></div>` : ''}
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <h6><i class="fas fa-list"></i> Ingredients:</h6>
+                    <ul class="list-unstyled">
+                        ${ingredientsList}
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6><i class="fas fa-tasks"></i> Instructions:</h6>
+                    <ol class="ps-3">
+                        ${stepsList}
+                    </ol>
+                </div>
+            </div>
+        </div>
+    `;
+};
+
+window.handleRecipeGenerationFailed = function(error) {
+    console.error('Recipe generation failed via WebSocket:', error);
+    document.getElementById('loadingState').style.display = 'none';
+    
+    alert('Error generating recipe: ' + error);
+    document.getElementById('recipeForm').style.display = 'block';
+};
+
+function generateRecipe(data) {
+    // Add user_id to data for WebSocket
+    data.user_id = currentUser.id;
+    
+    // Show loading state
+    document.getElementById('recipeForm').style.display = 'none';
+    document.getElementById('loadingState').style.display = 'block';
+    
+    // Send recipe generation request via WebSocket
+    socket.emit('generate_recipe_ws', data);
+    console.log('Sent recipe generation request via WebSocket:', data);
+}
+
+function fetchRecipeDetails(recipeId) {
+    fetch(`/recipe/${recipeId}`)
+        .then(response => response.text())
+        .then(html => {
+            // Extract recipe content from the HTML response
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const recipeContent = doc.querySelector('.recipe-content');
+            
+            if (recipeContent) {
+                document.getElementById('recipeContent').innerHTML = recipeContent.innerHTML;
+            } else {
+                document.getElementById('recipeContent').innerHTML = '<p>Recipe generated successfully!</p>';
+            }
+        });
+}
+
+// Save recipe button
+document.getElementById('saveRecipeBtn').addEventListener('click', function() {
+    if (window.generatedRecipeId) {
+        // First save the recipe
+        fetch(`/api/recipe/${window.generatedRecipeId}/save`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Then redirect to view the recipe
+                window.location.href = `/recipe/${window.generatedRecipeId}`;
+            }
+        });
+    }
+});
+
+// Start cooking button
+document.getElementById('startCookingBtn').addEventListener('click', function() {
+    if (window.generatedRecipeId) {
+        window.location.href = `/recipe/${window.generatedRecipeId}/cook`;
+    }
+});
+
+// Generate another recipe button
+document.getElementById('generateAnotherBtn').addEventListener('click', function() {
+    // Reset form and show it again
+    document.getElementById('recipeForm').reset();
+    document.getElementById('recipeDisplay').style.display = 'none';
+    document.getElementById('recipeForm').style.display = 'block';
+    document.getElementById('customDietaryInput').style.display = 'none';
+    
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+</script>
+{% endblock %}

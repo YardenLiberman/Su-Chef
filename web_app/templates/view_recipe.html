@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}{{ recipe.name }} - Su-Chef{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Recipe Header -->
+        <div class="card mb-4">
+            <div class="recipe-header">
+                <h1 class="mb-2">{{ recipe.name }}</h1>
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <i class="fas fa-clock fa-2x mb-2"></i>
+                        <div>{{ recipe.cooking_time }} min</div>
+                    </div>
+                    <div class="col-md-3">
+                        <i class="fas fa-signal fa-2x mb-2"></i>
+                        <div>{{ recipe.skill_level|title }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <i class="fas fa-utensils fa-2x mb-2"></i>
+                        <div>{{ recipe.meal_type|title }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <i class="fas fa-calendar fa-2x mb-2"></i>
+                        <div>{{ recipe.created_at[:10] if recipe.created_at else 'Unknown' }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recipe Actions -->
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <a href="{{ url_for('cook_recipe', recipe_id=recipe.id) }}" class="btn btn-success btn-lg me-3">
+                    <i class="fas fa-play"></i> Start Cooking
+                </a>
+                <button class="btn btn-outline-success btn-lg me-3 toggle-cooked" data-recipe-id="{{ recipe.id }}">
+                    {% if recipe.cooked %}
+                        <i class="fas fa-check-circle"></i> Marked as Cooked
+                    {% else %}
+                        <i class="fas fa-circle"></i> Mark as Cooked
+                    {% endif %}
+                </button>
+                <button class="btn btn-outline-danger btn-lg toggle-liked" data-recipe-id="{{ recipe.id }}">
+                    {% if recipe.liked %}
+                        <i class="fas fa-heart"></i> Liked
+                    {% else %}
+                        <i class="far fa-heart"></i> Like
+                    {% endif %}
+                </button>
+            </div>
+        </div>
+
+        <!-- Ingredients -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-list"></i> Ingredients</h5>
+            </div>
+            <div class="card-body">
+                {% set ingredients = recipe.ingredients|from_json %}
+                {% for ingredient in ingredients %}
+                <div class="ingredient-item">
+                    <i class="fas fa-check text-success me-2"></i>
+                    {{ ingredient }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-list-ol"></i> Instructions</h5>
+            </div>
+            <div class="card-body">
+                {% for step in recipe.steps %}
+                <div class="d-flex align-items-start mb-3">
+                    <div class="step-number">{{ step.step_number }}</div>
+                    <div class="flex-grow-1">
+                        <p class="mb-0">{{ step.step_text }}</p>
+                        {% if step.tips %}
+                        <small class="text-muted">
+                            <i class="fas fa-lightbulb text-warning"></i> {{ step.tips }}
+                        </small>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Recipe Info Sidebar -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0"><i class="fas fa-info-circle"></i> Recipe Info</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Difficulty:</strong>
+                    <span class="badge bg-{{ 'success' if recipe.skill_level == 'beginner' else 'warning' if recipe.skill_level == 'intermediate' else 'danger' }}">
+                        {{ recipe.skill_level|title }}
+                    </span>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Meal Type:</strong>
+                    <span class="badge bg-primary">{{ recipe.meal_type|title }}</span>
+                </div>
+                
+                {% if recipe.dietary_restrictions %}
+                <div class="mb-3">
+                    <strong>Dietary:</strong>
+                    <span class="badge bg-warning">{{ recipe.dietary_restrictions }}</span>
+                </div>
+                {% endif %}
+                
+                <div class="mb-3">
+                    <strong>Created:</strong><br>
+                    <small class="text-muted">{{ recipe.created_at[:10] if recipe.created_at else 'Unknown' }}</small>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Status:</strong><br>
+                    <span class="badge bg-{{ 'success' if recipe.cooked else 'secondary' }} me-2">
+                        {% if recipe.cooked %}Cooked{% else %}Not Cooked{% endif %}
+                    </span>
+                    <span class="badge bg-{{ 'danger' if recipe.liked else 'secondary' }}">
+                        {% if recipe.liked %}Liked{% else %}Not Liked{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h6 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h6>
+            </div>
+            <div class="card-body">
+                <a href="{{ url_for('cook_recipe', recipe_id=recipe.id) }}" class="btn btn-success w-100 mb-2">
+                    <i class="fas fa-play"></i> Start Cooking
+                </a>
+                <a href="{{ url_for('saved_recipes') }}" class="btn btn-outline-primary w-100 mb-2">
+                    <i class="fas fa-arrow-left"></i> Back to Recipes
+                </a>
+                <a href="{{ url_for('create_recipe') }}" class="btn btn-outline-success w-100">
+                    <i class="fas fa-plus-circle"></i> Create New Recipe
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Toggle cooked status
+document.querySelector('.toggle-cooked').addEventListener('click', function() {
+    const recipeId = this.dataset.recipeId;
+    const button = this;
+    
+    fetch(`/api/recipe/${recipeId}/toggle_cooked`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (data.cooked) {
+                button.innerHTML = '<i class="fas fa-check-circle"></i> Marked as Cooked';
+                button.classList.remove('btn-outline-success');
+                button.classList.add('btn-success');
+            } else {
+                button.innerHTML = '<i class="fas fa-circle"></i> Mark as Cooked';
+                button.classList.remove('btn-success');
+                button.classList.add('btn-outline-success');
+            }
+            // Reload page to update sidebar info
+            location.reload();
+        }
+    });
+});
+
+// Toggle liked status
+document.querySelector('.toggle-liked').addEventListener('click', function() {
+    const recipeId = this.dataset.recipeId;
+    const button = this;
+    
+    fetch(`/api/recipe/${recipeId}/toggle_liked`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (data.liked) {
+                button.innerHTML = '<i class="fas fa-heart"></i> Liked';
+                button.classList.remove('btn-outline-danger');
+                button.classList.add('btn-danger');
+            } else {
+                button.innerHTML = '<i class="far fa-heart"></i> Like';
+                button.classList.remove('btn-danger');
+                button.classList.add('btn-outline-danger');
+            }
+            // Reload page to update sidebar info
+            location.reload();
+        }
+    });
+});
+</script>
+{% endblock %}

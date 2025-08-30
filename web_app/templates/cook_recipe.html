@@ -1,0 +1,1041 @@
+{% extends "base.html" %}
+
+{% block title %}Cooking {{ recipe.name }} - Su-Chef{% endblock %}
+
+{% block extra_css %}
+<style>
+.custom-notification {
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.custom-notification .btn-close {
+    padding: 0.5rem;
+    margin: -0.5rem -0.5rem -0.5rem auto;
+}
+
+.custom-notification .fas {
+    margin-right: 8px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Recipe Header -->
+        <div class="card mb-4">
+            <div class="recipe-header">
+                <h1 class="mb-2">{{ recipe.name }}</h1>
+                <p class="mb-0">Let's start cooking! Follow the steps below or use voice commands.</p>
+            </div>
+        </div>
+
+        <!-- Voice-Controlled Cooking Interface -->
+        <div class="card mb-4" id="voiceCookingCard">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-microphone"></i> Voice-Controlled Cooking
+                </h5>
+            </div>
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <h6 class="text-success">🎤 Cooking Mode is On</h6>
+                    <p class="text-muted">Use the voice controls below to navigate through your recipe</p>
+                </div>
+                
+                <!-- Voice Control Toggle -->
+                <div class="mb-3">
+                    <button class="btn btn-outline-primary btn-lg" id="voiceToggleBtn">
+                        <i class="fas fa-microphone"></i> Start Voice Recognition
+                    </button>
+                    <small class="d-block text-muted mt-2">Click to start/stop voice recognition</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Question Modal -->
+        <div class="modal fade" id="helpModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title">
+                            <i class="fas fa-question-circle"></i> Ask Your Su Chef
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                                                 <div class="mb-3">
+                             <label for="cookingQuestion" class="form-label">What would you like to know about cooking?</label>
+                                                           <div class="form-control" id="cookingQuestion" style="min-height: 80px; white-space: pre-wrap; word-wrap: break-word; font-family: Arial, sans-serif; background-color: #f8f9fa; border: 1px solid #ced4da; border-radius: 0.375rem; padding: 0.375rem 0.75rem; cursor: text;" contenteditable="true" placeholder="Type your cooking question here..."></div>
+                         </div>
+                         
+                                                   
+                        <div class="mb-3">
+                            <small class="text-muted">
+                                <i class="fas fa-lightbulb"></i> 
+                                Your question will be answered by our AI cooking assistant using OpenAI
+                            </small>
+                        </div>
+                        <div id="answerDisplay" style="display: none;">
+                            <div class="alert alert-success">
+                                <h6><i class="fas fa-robot"></i> AI Su Chef Answer:</h6>
+                                <div id="aiAnswer"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-warning" id="askQuestionBtn">
+                            <i class="fas fa-paper-plane"></i> Ask Question
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Cooking Timer -->
+        <div class="cooking-timer">
+            <h5><i class="fas fa-clock"></i> Cooking Timer</h5>
+            <div class="timer-display" id="timerDisplay">00:00</div>
+            <div class="mt-3">
+                <button class="btn btn-light btn-sm me-2" id="startTimer">
+                    <i class="fas fa-play"></i> Start
+                </button>
+                <button class="btn btn-light btn-sm me-2" id="pauseTimer">
+                    <i class="fas fa-pause"></i> Pause
+                </button>
+                <button class="btn btn-light btn-sm" id="resetTimer">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+            </div>
+        </div>
+
+
+
+        <!-- Current Step Display -->
+        <div class="card mb-4" id="currentStepCard">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-play"></i> Current Step: 
+                    <span id="currentStepNumber">1</span> of {{ recipe.steps|length }}
+                </h5>
+            </div>
+            <div class="card-body text-center">
+                <div class="step-display">
+                    <div class="step-number-large mb-3" id="currentStepNumberLarge">1</div>
+                    <h4 id="currentStepText">{{ recipe.steps[0].step_text }}</h4>
+                </div>
+                
+                <!-- Voice Control Buttons -->
+                <div class="mt-4">
+                    <div class="d-flex justify-content-center gap-2 mb-3">
+                        <button class="btn btn-outline-primary btn-lg" id="prevStepBtn" disabled>
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </button>
+                        <button class="btn btn-outline-info btn-lg" id="repeatStepBtn">
+                            <i class="fas fa-redo"></i> Repeat
+                        </button>
+                        <button class="btn btn-success btn-lg" id="nextStepBtn">
+                            <i class="fas fa-forward"></i> Next
+                        </button>
+                        <button class="btn btn-warning btn-lg" id="helpBtn">
+                            <i class="fas fa-question-circle"></i> Help
+                        </button>
+                                                 <button class="btn btn-danger btn-lg" id="endCookingBtn">
+                             <i class="fas fa-stop"></i> End Cooking
+                         </button>
+                    </div>
+                    
+                    <div class="alert alert-info" id="voiceStatus">
+                        <i class="fas fa-info-circle"></i> 
+                                                 <span id="statusText">Use these buttons to control your cooking session. Click Start Voice Recognition to begin!</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h6 class="mb-3">Cooking Progress</h6>
+                <div class="progress mb-2" style="height: 25px;">
+                    <div class="progress-bar bg-success" id="progressBar" role="progressbar" style="width: 0%">
+                        0%
+                    </div>
+                </div>
+                <small class="text-muted">
+                    Step <span id="progressStep">1</span> of {{ recipe.steps|length }} completed
+                </small>
+            </div>
+        </div>
+
+        <!-- All Steps Overview -->
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-list-ol"></i> All Steps</h5>
+            </div>
+            <div class="card-body">
+                {% for step in recipe.steps %}
+                <div class="step-item mb-3" data-step="{{ step.step_number }}">
+                    <div class="d-flex align-items-start">
+                        <div class="step-number step-number-small">{{ step.step_number }}</div>
+                        <div class="flex-grow-1">
+                            <p class="mb-0">{{ step.step_text }}</p>
+                            {% if step.tips %}
+                            <small class="text-muted">
+                                <i class="fas fa-lightbulb text-warning"></i> {{ step.tips }}
+                            </small>
+                            {% endif %}
+                        </div>
+                        <div class="step-status ms-2">
+                            <i class="fas fa-circle text-muted" id="stepStatus{{ step.step_number }}"></i>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Ingredients Checklist -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h6 class="mb-0"><i class="fas fa-list"></i> Ingredients Checklist</h6>
+            </div>
+            <div class="card-body">
+                {% set ingredients = recipe.ingredients|from_json %}
+                {% for ingredient in ingredients %}
+                <div class="form-check mb-2">
+                    <input class="form-check-input ingredient-checkbox" type="checkbox" id="ingredient{{ loop.index }}">
+                    <label class="form-check-label" for="ingredient{{ loop.index }}">
+                        {{ ingredient }}
+                    </label>
+                </div>
+                {% endfor %}
+                <div class="mt-3">
+                    <small class="text-muted">
+                        <span id="ingredientsCompleted">0</span> of {{ ingredients|length }} ingredients gathered
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cooking Tips -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h6 class="mb-0"><i class="fas fa-lightbulb"></i> Cooking Tips</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success me-2"></i>
+                        Read through all steps before starting
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success me-2"></i>
+                        Gather all ingredients first
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success me-2"></i>
+                        Use the timer for precise cooking
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success me-2"></i>
+                        Don't rush - cooking is an art!
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h6 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h6>
+            </div>
+            <div class="card-body">
+                <button class="btn btn-outline-success w-100 mb-2" id="markCookedBtn">
+                    <i class="fas fa-check-circle"></i> Mark as Cooked
+                </button>
+                <a href="{{ url_for('view_recipe', recipe_id=recipe.id) }}" class="btn btn-outline-primary w-100 mb-2">
+                    <i class="fas fa-eye"></i> View Full Recipe
+                </a>
+                <a href="{{ url_for('saved_recipes') }}" class="btn btn-outline-secondary w-100">
+                    <i class="fas fa-arrow-left"></i> Back to Recipes
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Recipe data
+const recipeSteps = {{ recipe.steps|tojson }};
+const totalSteps = recipeSteps.length;
+let currentStep = 1;
+let timerRunning = false;
+let timerInterval;
+let seconds = 0;
+
+// Voice feedback system - text-to-speech only for now
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+        updateStepDisplay();
+        updateProgress();
+        updateIngredientsProgress();
+        updateButtonStates();
+        
+        // No automatic voice - wait for user to click Start Voice Recognition
+        updateVoiceStatus('🎤 Ready to help you cook! Click Start Voice Recognition to begin your cooking session.');
+    
+        // Step navigation (for manual navigation)
+        document.getElementById('nextStepBtn').addEventListener('click', nextStep);
+        document.getElementById('prevStepBtn').addEventListener('click', previousStep);
+        
+        // Timer controls
+        document.getElementById('startTimer').addEventListener('click', startTimer);
+        document.getElementById('pauseTimer').addEventListener('click', pauseTimer);
+        document.getElementById('resetTimer').addEventListener('click', resetTimer);
+        
+        // Mark as cooked
+        document.getElementById('markCookedBtn').addEventListener('click', markAsCooked);
+        
+        // Ingredient checkboxes
+        document.querySelectorAll('.ingredient-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', updateIngredientsProgress);
+        });
+        
+        // Voice cooking controls
+        document.getElementById('prevStepBtn').addEventListener('click', previousStep);
+        document.getElementById('repeatStepBtn').addEventListener('click', repeatStep);
+        document.getElementById('nextStepBtn').addEventListener('click', nextStep);
+        document.getElementById('helpBtn').addEventListener('click', openHelpModal);
+        document.getElementById('endCookingBtn').addEventListener('click', endCooking);
+         
+        // Add debugging to askQuestionBtn to prevent multiple clicks
+        const askQuestionBtn = document.getElementById('askQuestionBtn');
+        askQuestionBtn.addEventListener('click', function(e) {
+            console.log('🔍 Ask Question button clicked');
+            console.log('🔍 Button disabled state:', askQuestionBtn.disabled);
+            if (!askQuestionBtn.disabled) {
+                askQuestionBtn.disabled = true; // Prevent multiple clicks
+                askCookingQuestion();
+            } else {
+                console.log('⚠️ Button already disabled, ignoring click');
+            }
+        });
+        
+        // Voice recognition toggle
+        document.getElementById('voiceToggleBtn').addEventListener('click', toggleVoiceRecognition);
+         
+        // Regular keyboard functionality for the contenteditable div
+        const questionDiv = document.getElementById('cookingQuestion');
+        if (questionDiv) {
+            // Handle regular keyboard input
+            questionDiv.addEventListener('keydown', function(e) {
+                console.log('🔍 Regular keyboard keydown:', e.key, 'KeyCode:', e.keyCode, 'Code:', e.code);
+                
+                // Allow all keys including space
+                if (e.key === ' ') {
+                    e.preventDefault(); // Prevent default space behavior
+                    // Insert space manually
+                    const selection = window.getSelection();
+                    const range = selection.getRangeAt(0);
+                    const spaceNode = document.createTextNode(' ');
+                    range.insertNode(spaceNode);
+                    range.setStartAfter(spaceNode);
+                    range.setEndAfter(spaceNode);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                     
+                    console.log('✅ Space inserted manually');
+                    console.log('Current text after space:', questionDiv.textContent);
+                    console.log('Contains spaces:', questionDiv.textContent.includes(' '));
+                }
+            });
+             
+            // Handle input events (for all other keys)
+            questionDiv.addEventListener('input', function(e) {
+                console.log('🔍 Input event triggered');
+                console.log('Current text:', questionDiv.textContent);
+                console.log('Text length:', questionDiv.textContent.length);
+                console.log('Contains spaces:', questionDiv.textContent.includes(' '));
+                console.log('Raw input:', e.data);
+            });
+             
+             // Handle paste events
+             questionDiv.addEventListener('paste', function(e) {
+                 e.preventDefault();
+                 const text = e.clipboardData.getData('text/plain');
+                 document.execCommand('insertText', false, text);
+                 console.log('✅ Text pasted:', text);
+             });
+             
+             // Focus event to ensure proper handling
+             questionDiv.addEventListener('focus', function() {
+                 console.log('🔍 Question div focused');
+                 // Ensure cursor is at the end
+                 const range = document.createRange();
+                 const selection = window.getSelection();
+                 range.selectNodeContents(questionDiv);
+                 range.collapse(false);
+                 selection.removeAllRanges();
+                 selection.addRange(range);
+             });
+         }
+    });
+
+function updateStepDisplay() {
+    const step = recipeSteps[currentStep - 1];
+    document.getElementById('currentStepNumber').textContent = currentStep;
+    document.getElementById('currentStepNumberLarge').textContent = currentStep;
+    document.getElementById('currentStepText').textContent = step.step_text;
+    
+    // Update step status
+    document.querySelectorAll('.step-status i').forEach((icon, index) => {
+        if (index + 1 < currentStep) {
+            icon.className = 'fas fa-check-circle text-success';
+        } else if (index + 1 === currentStep) {
+            icon.className = 'fas fa-play-circle text-primary';
+        } else {
+            icon.className = 'fas fa-circle text-muted';
+        }
+    });
+    
+    // Update navigation buttons
+    document.getElementById('prevStepBtn').disabled = currentStep === 1;
+    // Don't disable Next button on last step - let user click it to finish cooking
+    
+    // Update progress
+    updateProgress();
+}
+
+function nextStep() {
+    if (currentStep < totalSteps) {
+        currentStep++;
+        updateStepDisplay();
+        updateButtonStates();
+        
+        // Voice feedback - just say step number and read the step
+        const step = recipeSteps[currentStep - 1];
+        if (step) {
+            speakText(`Step ${currentStep}: ${step.step_text}`);
+        }
+    } else {
+        // Automatically finish cooking when on last step - handle exactly like End Cooking but without confirmation
+        completeCookingSession();
+    }
+}
+
+function previousStep() {
+    if (currentStep > 1) {
+        currentStep--;
+        updateStepDisplay();
+        updateButtonStates();
+        
+        // Voice feedback - just say step number and read the step
+        const step = recipeSteps[currentStep - 1];
+        if (step) {
+            speakText(`Step ${currentStep}: ${step.step_text}`);
+        }
+    } else {
+        speakText("You're already at the first step!");
+    }
+}
+
+function repeatStep() {
+    // Highlight current step briefly
+    const currentStepElement = document.querySelector(`[data-step="${currentStep}"]`);
+    currentStepElement.style.backgroundColor = '#e3f2fd';
+    setTimeout(() => {
+        currentStepElement.style.backgroundColor = '';
+    }, 1000);
+    
+    // Speak the current step
+    const step = recipeSteps[currentStep - 1];
+    if (step) {
+        const stepText = `Step ${currentStep}: ${step.step_text}`;
+        speakText(stepText);
+        document.getElementById('statusText').textContent = `Repeated step ${currentStep}`;
+    }
+}
+
+function updateProgress() {
+    const progress = ((currentStep - 1) / totalSteps) * 100;
+    document.getElementById('progressBar').style.width = progress + '%';
+    document.getElementById('progressBar').textContent = Math.round(progress) + '%';
+    document.getElementById('progressStep').textContent = currentStep - 1;
+}
+
+function startTimer() {
+    if (!timerRunning) {
+        timerRunning = true;
+        timerInterval = setInterval(updateTimer, 1000);
+        document.getElementById('startTimer').style.display = 'none';
+        document.getElementById('pauseTimer').style.display = 'inline-block';
+    }
+}
+
+function pauseTimer() {
+    if (timerRunning) {
+        timerRunning = false;
+        clearInterval(timerInterval);
+        document.getElementById('startTimer').style.display = 'inline-block';
+        document.getElementById('pauseTimer').style.display = 'none';
+    }
+}
+
+function resetTimer() {
+    pauseTimer();
+    seconds = 0;
+    updateTimerDisplay();
+}
+
+function updateTimer() {
+    seconds++;
+    updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    document.getElementById('timerDisplay').textContent = 
+        `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
+// This duplicate function was removed - keeping only the correct one below
+
+function updateIngredientsProgress() {
+    const checkboxes = document.querySelectorAll('.ingredient-checkbox');
+    const completed = Array.from(checkboxes).filter(cb => cb.checked).length;
+    document.getElementById('ingredientsCompleted').textContent = completed;
+}
+
+function markAsCooked() {
+    if (confirm('Mark this recipe as cooked?')) {
+        fetch(`/api/recipe/{{ recipe.id }}/toggle_cooked`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show a nicer notification instead of alert
+                showNotification('Recipe marked as cooked! Great job! 🎉', 'success');
+                
+                // Update button state based on the response
+                const button = document.getElementById('markCookedBtn');
+                if (data.cooked) {
+                    button.innerHTML = '<i class="fas fa-check-circle"></i> Cooked!';
+                    button.classList.remove('btn-outline-success');
+                    button.classList.add('btn-success');
+                } else {
+                    button.innerHTML = '<i class="fas fa-circle"></i> Mark Cooked';
+                    button.classList.remove('btn-success');
+                    button.classList.add('btn-outline-success');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Error updating recipe status. Please try again.', 'error');
+        });
+    }
+}
+
+// Add a nice notification function
+function showNotification(message, type = 'info') {
+    // Remove any existing notifications
+    const existingNotification = document.querySelector('.custom-notification');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
+    
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `custom-notification alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border: none;
+        border-radius: 8px;
+    `;
+    
+    notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    // Add to page
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 5000);
+}
+
+// Voice Cooking Functions
+function endCooking() {
+    if (confirm('End cooking session? This will complete your cooking and reset to the first step.')) {
+        completeCookingSession();
+    }
+}
+
+function completeCookingSession() {
+    // Voice feedback
+    speakText("Congratulations! You've completed your cooking session. Thank you for cooking with Su-Chef!");
+    
+    // Reset to first step
+    currentStep = 1;
+    updateStepDisplay();
+    
+    // Update button states
+    updateButtonStates();
+    
+    // Update status
+    document.getElementById('statusText').textContent = '🎉 Cooking session completed! Ready to start again!';
+    
+    // Reset status after a delay
+    setTimeout(() => {
+        updateVoiceStatus('🎤 Ready to help you cook! Click Start Voice Recognition to begin a new session.');
+    }, 3000);
+}
+
+function updateButtonStates() {
+    // Update Previous button
+    document.getElementById('prevStepBtn').disabled = currentStep === 1;
+    
+    // Don't disable Next button on last step - let user click it to finish cooking
+}
+
+function openHelpModal() {
+    // Reset the modal
+    const questionDiv = document.getElementById('cookingQuestion');
+    const answerDisplay = document.getElementById('answerDisplay');
+    
+    if (questionDiv) {
+        questionDiv.textContent = '';
+    }
+    
+    if (answerDisplay) {
+        answerDisplay.style.display = 'none';
+    }
+    
+         // No voice feedback when opening help modal - completely silent
+     // speakText("Help modal opened. Type your question with your keyboard, then click Ask Question.");
+    
+    // Show the modal
+    const modal = new bootstrap.Modal(document.getElementById('helpModal'));
+    modal.show();
+    
+    // Ensure modal is fully loaded before proceeding
+    setTimeout(() => {
+        // Double-check elements exist after modal is shown
+        const aiAnswerElement = document.getElementById('aiAnswer');
+        const answerDisplayElement = document.getElementById('answerDisplay');
+        
+        if (!aiAnswerElement) {
+            console.error('❌ aiAnswer element still not found after modal show');
+        }
+        
+        if (!answerDisplayElement) {
+            console.error('❌ answerDisplay element still not found after modal show');
+        }
+        
+        console.log('🔍 Modal elements check:', {
+            questionDiv: !!questionDiv,
+            answerDisplay: !!answerDisplay,
+            aiAnswer: !!aiAnswerElement
+        });
+    }, 100);
+}
+
+ function askCookingQuestion() {
+     console.log('🔍 askCookingQuestion function called');
+     
+     const question = document.getElementById('cookingQuestion').textContent.trim();
+     
+     if (!question) {
+         alert('Please enter a cooking question.');
+         return;
+     }
+     
+     // Debug: log the question to see if spaces are preserved
+     console.log('Question being sent:', question);
+     console.log('Question length:', question.length);
+     console.log('Question with quotes:', `"${question}"`);
+     console.log('Question split by spaces:', question.split(' '));
+     console.log('Question contains spaces:', question.includes(' '));
+    
+    // Show loading state
+    document.getElementById('askQuestionBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Asking...';
+    document.getElementById('askQuestionBtn').disabled = true;
+    
+    // Get recipe context for better answers - include current step specifically
+    const currentStepText = recipeSteps[currentStep - 1] ? recipeSteps[currentStep - 1].step_text : '';
+    const recipeContext = `Current Step ${currentStep}: ${currentStepText}\n\nFull Recipe: ${recipeSteps.map(s => s.step_text).join(' ')}`;
+    
+    // Call the API
+    console.log('🌐 Making API call to /api/voice/cooking_question');
+    console.log('🌐 Request body:', { question: question, recipe_context: recipeContext });
+    
+    fetch('/api/voice/cooking_question', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            question: question,
+            recipe_context: recipeContext
+        })
+    })
+    .then(async response => {
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        
+        // Check if response is ok first
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        // Try to parse JSON response
+        let data;
+        try {
+            data = await response.json();
+            console.log('✅ JSON parsed successfully:', data);
+        } catch (parseError) {
+            console.error('❌ Failed to parse JSON:', parseError);
+            throw new Error('Server returned invalid JSON response');
+        }
+        
+        // Validate response structure
+        if (!data || typeof data !== 'object') {
+            throw new Error('Invalid response format from server');
+        }
+        
+        console.log('🔍 Response data structure:', {
+            hasSuccess: 'success' in data,
+            hasAnswer: 'answer' in data,
+            successType: typeof data.success,
+            answerType: typeof data.answer,
+            successValue: data.success,
+            answerLength: data.answer ? data.answer.length : 0
+        });
+        
+        // Check if we have a valid answer
+        if (data.success === true && data.answer && typeof data.answer === 'string') {
+            console.log('🎯 Valid answer received, displaying...');
+            
+                         // Simple element creation - always create fresh elements
+             const modalBody = document.querySelector('#helpModal .modal-body');
+             if (modalBody) {
+                 // Remove existing answer display if it exists
+                 const existingAnswer = document.getElementById('answerDisplay');
+                 if (existingAnswer) {
+                     existingAnswer.remove();
+                 }
+                 
+                 // Create new answer display
+                 const newAnswerDisplay = document.createElement('div');
+                 newAnswerDisplay.id = 'answerDisplay';
+                 newAnswerDisplay.style.display = 'block';
+                 newAnswerDisplay.innerHTML = `
+                     <div class="alert alert-success">
+                         <h6><i class="fas fa-robot"></i> AI Su Chef Answer:</h6>
+                         <div id="aiAnswer">${data.answer.replace(/\n/g, '<br>')}</div>
+                     </div>
+                 `;
+                 modalBody.appendChild(newAnswerDisplay);
+                 
+                                   console.log('✅ Answer elements created and displayed');
+                  
+                  // Speak the answer
+                  console.log('🔊 About to speak answer:', data.answer);
+                  speakText(data.answer);
+                  console.log('✅ Answer spoken successfully');
+                  
+                                    // Update status to show question was answered
+                  const statusElement = document.getElementById('statusText');
+                  if (statusElement) {
+                      statusElement.textContent = `Question answered! Click any button to continue.`;
+                  }
+              } else {
+                  console.error('❌ Modal body not found');
+                  // Still try to speak the answer even if display fails
+                  console.log('🔊 About to speak answer (display failed):', data.answer);
+                  speakText(data.answer);
+                  console.log('✅ Answer spoken successfully');
+              }
+        } else {
+            console.error('❌ Invalid response structure:', data);
+            throw new Error(data.error || 'Unexpected response format from server');
+        }
+    })
+         .catch(error => {
+         console.error('Error:', error);
+         
+                   // Show a more helpful error message
+          const errorMessage = error.message || 'Unknown error occurred';
+          console.log('🔊 About to speak error:', errorMessage);
+          speakText(`Error: ${errorMessage}`);
+         
+         // Try to display error in the modal instead of alert
+         const modalBody = document.querySelector('#helpModal .modal-body');
+         if (modalBody) {
+             // Remove existing answer display if it exists
+             const existingAnswer = document.getElementById('answerDisplay');
+             if (existingAnswer) {
+                 existingAnswer.remove();
+             }
+             
+             // Create error display
+             const errorDisplay = document.createElement('div');
+             errorDisplay.id = 'answerDisplay';
+             errorDisplay.style.display = 'block';
+             errorDisplay.innerHTML = `
+                 <div class="alert alert-danger">
+                     <h6><i class="fas fa-exclamation-triangle"></i> Error:</h6>
+                     <div>${errorMessage}</div>
+                 </div>
+             `;
+             modalBody.appendChild(errorDisplay);
+         } else {
+             // Fallback to alert if modal body not found
+             alert(`Error: ${errorMessage}`);
+         }
+     })
+         .finally(() => {
+         console.log('🔍 Finally block executed, resetting button');
+         // Reset button
+         document.getElementById('askQuestionBtn').innerHTML = '<i class="fas fa-paper-plane"></i> Ask Question';
+         document.getElementById('askQuestionBtn').disabled = false;
+         console.log('✅ Button reset complete');
+     });
+}
+
+ function speakText(text) {
+     console.log('🔊 speakText called with:', text);
+     
+     // Use browser's built-in speech synthesis for immediate feedback
+     if ('speechSynthesis' in window) {
+         console.log('✅ SpeechSynthesis supported');
+         const utterance = new SpeechSynthesisUtterance(text);
+         utterance.rate = 0.9; // Slightly slower for clarity
+         utterance.pitch = 1.0;
+         utterance.volume = 1.0;
+         
+         // Always use the same male voice for consistency
+         const voices = speechSynthesis.getVoices();
+         console.log('🔍 Available voices:', voices.length);
+         const maleVoice = voices.find(voice => 
+             voice.name.includes('David') || 
+             voice.name.includes('Male') || 
+             voice.name.includes('en-US') ||
+             voice.lang === 'en-US'
+         );
+         if (maleVoice) {
+             utterance.voice = maleVoice;
+             console.log('✅ Using voice:', maleVoice.name);
+         } else {
+             console.log('⚠️ No male voice found, using default');
+         }
+         
+         console.log('🔊 Starting speech synthesis...');
+         speechSynthesis.speak(utterance);
+         console.log('✅ Speech synthesis started');
+     } else {
+         console.error('❌ SpeechSynthesis not supported');
+     }
+    
+    // Also call our Azure Speech API for better quality (optional)
+    fetch('/api/voice/speak', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: text })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Text sent to Azure Speech Services:', data.message);
+        }
+    })
+    .catch(error => {
+        console.log('Azure Speech Services not available, using browser TTS');
+    });
+}
+
+// Voice feedback functions - no voice recognition yet, just text-to-speech
+
+function updateVoiceStatus(message) {
+    const statusElement = document.getElementById('statusText');
+    if (statusElement) {
+        statusElement.textContent = message;
+    }
+    console.log('Voice Status:', message);
+}
+
+  function toggleVoiceRecognition() {
+     const voiceToggleBtn = document.getElementById('voiceToggleBtn');
+     
+     // Voice feedback - welcome message and first step
+             speakText("Hey, I'm your Su Chef cooking assistant, let's start cooking!");
+     
+     // Wait a moment then read the first step
+     setTimeout(() => {
+         const firstStep = recipeSteps[0];
+         if (firstStep) {
+             speakText(`Step 1: ${firstStep.step_text}`);
+         }
+         updateVoiceStatus('🎤 Voice mode active! Use the buttons below to control your cooking.');
+     }, 3000);
+     
+     // Update button state
+     voiceToggleBtn.innerHTML = '<i class="fas fa-microphone"></i> Voice Mode Active';
+     voiceToggleBtn.classList.remove('btn-outline-primary');
+     voiceToggleBtn.classList.add('btn-success');
+     
+     // Update status
+     updateVoiceStatus('🎤 Voice mode active! Reading first step...');
+     
+     // Disable the button after activation
+     voiceToggleBtn.disabled = true;
+  }
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    switch(e.key) {
+        case 'ArrowRight':
+            if (currentStep < totalSteps) nextStep();
+            break;
+        case 'ArrowLeft':
+            if (currentStep > 1) previousStep();
+            break;
+        case ' ':
+            e.preventDefault();
+            if (timerRunning) pauseTimer();
+            else startTimer();
+            break;
+        case 'r':
+        case 'R':
+            repeatStep();
+            break;
+    }
+});
+
+// Toggle cooked status
+document.querySelectorAll('.toggle-cooked').forEach(button => {
+    button.addEventListener('click', function() {
+        const recipeId = this.dataset.recipeId;
+        const button = this;
+        
+        fetch(`/api/recipe/${recipeId}/toggle_cooked`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.cooked) {
+                    button.innerHTML = '<i class="fas fa-check-circle"></i> Cooked';
+                    button.classList.remove('btn-outline-success');
+                    button.classList.add('btn-success');
+                } else {
+                    button.innerHTML = '<i class="fas fa-circle"></i> Mark Cooked';
+                    button.classList.remove('btn-success');
+                    button.classList.add('btn-outline-success');
+                }
+            }
+        });
+    });
+});
+
+// Toggle liked status
+document.querySelectorAll('.toggle-liked').forEach(button => {
+    button.addEventListener('click', function() {
+        const recipeId = this.dataset.recipeId;
+        const button = this;
+        
+        fetch(`/api/recipe/${recipeId}/toggle_liked`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.liked) {
+                    button.innerHTML = '<i class="fas fa-heart"></i> Liked';
+                    button.classList.remove('btn-outline-danger');
+                    button.classList.add('btn-danger');
+                } else {
+                    button.innerHTML = '<i class="far fa-heart"></i> Like';
+                    button.classList.remove('btn-danger');
+                    button.classList.add('btn-outline-danger');
+                }
+            }
+        });
+    });
+});
+
+// Delete recipe
+document.querySelectorAll('.delete-recipe').forEach(button => {
+    button.addEventListener('click', function() {
+        const recipeId = this.dataset.recipeId;
+        const recipeName = this.dataset.recipeName;
+        
+        if (confirm(`Are you sure you want to delete "${recipeName}"?\n\nThis action cannot be undone.`)) {
+            fetch(`/api/recipe/${recipeId}/delete`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Recipe deleted successfully! Redirecting to dashboard...');
+                    window.location.href = '/dashboard';
+                } else {
+                    alert('Error deleting recipe: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting recipe. Please try again.');
+            });
+        }
+    });
+});
+</script>
+{% endblock %}
