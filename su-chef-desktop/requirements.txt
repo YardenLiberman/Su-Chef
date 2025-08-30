@@ -1,0 +1,4 @@
+# Su-Chef Core Dependencies
+python-dotenv>=1.0.0
+openai>=1.0.0
+azure-cognitiveservices-speech>=1.31.0

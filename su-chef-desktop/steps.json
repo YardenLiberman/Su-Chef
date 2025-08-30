@@ -1,0 +1,38 @@
+{
+    "recipe_name": "Easy Lemon Garlic Shrimp Pasta",
+    "ingredients": [
+        "8 oz linguine pasta",
+        "1/2 lb peeled and deveined shrimp",
+        "3 cloves garlic, minced",
+        "1 lemon, juiced and zested",
+        "2 tbsp olive oil",
+        "Salt and pepper to taste",
+        "Fresh parsley for garnish"
+    ],
+    "steps": [
+        {
+            "step_number": 1,
+            "text": "Cook the linguine pasta according to package instructions. Drain and set aside."
+        },
+        {
+            "step_number": 2,
+            "text": "In a large skillet, heat olive oil over medium heat. Add minced garlic and cook until fragrant, about 1 minute."
+        },
+        {
+            "step_number": 3,
+            "text": "Add the shrimp to the skillet and cook until pink and opaque, about 2-3 minutes per side."
+        },
+        {
+            "step_number": 4,
+            "text": "Add lemon juice and zest to the skillet, stirring to combine with the shrimp."
+        },
+        {
+            "step_number": 5,
+            "text": "Toss in the cooked pasta and mix everything together. Season with salt and pepper to taste."
+        },
+        {
+            "step_number": 6,
+            "text": "Serve the lemon garlic shrimp pasta hot, garnished with fresh parsley. Enjoy!"
+        }
+    ]
+}
