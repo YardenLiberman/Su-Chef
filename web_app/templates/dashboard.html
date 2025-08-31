@@ -1,0 +1,319 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Su-Chef{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section text-center">
+    <div class="container">
+        <h1 class="display-4 mb-3">Welcome back, {{ user.username }}! 👨‍🍳</h1>
+        <p class="lead mb-4">Ready to create something delicious today?</p>
+        <a href="{{ url_for('create_recipe') }}" class="btn btn-light btn-lg">
+            <i class="fas fa-plus-circle"></i> Create New Recipe
+        </a>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-5">
+    <div class="col-md-4 mb-3">
+        <div class="stats-card">
+            <i class="fas fa-utensils fa-2x text-success mb-3"></i>
+            <div class="stats-number">{{ total_recipes }}</div>
+            <p class="text-muted">Total Recipes</p>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="stats-card">
+            <i class="fas fa-heart fa-2x text-danger mb-3"></i>
+            <div class="stats-number">{{ liked_recipes }}</div>
+            <p class="text-muted">Favorites</p>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="stats-card">
+            <i class="fas fa-check-circle fa-2x text-success mb-3"></i>
+            <div class="stats-number">{{ cooked_recipes }}</div>
+            <p class="text-muted">Recipes Cooked</p>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('create_recipe') }}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-plus-circle fa-2x d-block mb-2"></i>
+                            Create Recipe
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('saved_recipes') }}" class="btn btn-outline-success w-100">
+                            <i class="fas fa-bookmark fa-2x d-block mb-2"></i>
+                            View Recipes
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('saved_recipes') }}?filter=cooked" class="btn btn-outline-warning w-100">
+                            <i class="fas fa-check-circle fa-2x d-block mb-2"></i>
+                            Cooked Recipes
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('saved_recipes') }}?filter=liked" class="btn btn-outline-danger w-100">
+                            <i class="fas fa-heart fa-2x d-block mb-2"></i>
+                            Favorites
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Recipes -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-utensils"></i> Recent Recipes</h5>
+                <a href="{{ url_for('saved_recipes') }}" class="btn btn-light btn-sm">
+                    View All <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="card-body">
+                {% if recent_recipes %}
+                    <div class="row">
+                        {% for recipe in recent_recipes %}
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="recipe-card">
+                                <div class="recipe-header">
+                                    <h6 class="mb-1">{{ recipe.name }}</h6>
+                                    <small>
+                                        <i class="fas fa-clock"></i> {{ recipe.cooking_time }} min |
+                                        <i class="fas fa-signal"></i> {{ recipe.skill_level }}
+                                    </small>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="badge bg-primary">{{ recipe.meal_type }}</span>
+                                        {% if recipe.dietary_restrictions %}
+                                            <span class="badge bg-warning">{{ recipe.dietary_restrictions }}</span>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <a href="{{ url_for('view_recipe', recipe_id=recipe.id) }}" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                        <button class="btn btn-success btn-sm launch-cooking-btn" 
+                                                data-recipe-id="{{ recipe.id }}"
+                                                data-recipe-name="{{ recipe.name }}"
+                                                data-meal-type="{{ recipe.meal_type }}"
+                                                data-cooking-time="{{ recipe.cooking_time }}"
+                                                data-skill-level="{{ recipe.skill_level }}"
+                                                data-dietary="{{ recipe.dietary_restrictions or '' }}"
+                                                data-ingredients="{{ recipe.ingredients | from_json | tojson }}"
+                                                data-steps="{{ recipe.steps | map(attribute='step_text') | list | tojson }}">
+                                            <i class="fas fa-desktop"></i> Start Cooking
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="mt-2">
+                                        <button class="btn btn-sm btn-outline-success toggle-cooked" data-recipe-id="{{ recipe.id }}">
+                                            {% if recipe.cooked %}
+                                                <i class="fas fa-check-circle"></i> Cooked
+                                            {% else %}
+                                                <i class="fas fa-circle"></i> Mark Cooked
+                                            {% endif %}
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger toggle-liked" data-recipe-id="{{ recipe.id }}">
+                                            {% if recipe.liked %}
+                                                <i class="fas fa-heart"></i> Liked
+                                            {% else %}
+                                                <i class="far fa-heart"></i> Like
+                                            {% endif %}
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-warning delete-recipe" data-recipe-id="{{ recipe.id }}" data-recipe-name="{{ recipe.name }}">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-utensils fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No recipes yet</h5>
+                        <p class="text-muted">Create your first recipe to get started!</p>
+                        <a href="{{ url_for('create_recipe') }}" class="btn btn-primary">
+                            <i class="fas fa-plus-circle"></i> Create Recipe
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Toggle cooked status
+document.querySelectorAll('.toggle-cooked').forEach(button => {
+    button.addEventListener('click', function() {
+        const recipeId = this.dataset.recipeId;
+        const button = this;
+        
+        fetch(`/api/recipe/${recipeId}/toggle_cooked`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.cooked) {
+                    button.innerHTML = '<i class="fas fa-check-circle"></i> Cooked';
+                    button.classList.remove('btn-outline-success');
+                    button.classList.add('btn-success');
+                } else {
+                    button.innerHTML = '<i class="fas fa-circle"></i> Mark Cooked';
+                    button.classList.remove('btn-success');
+                    button.classList.add('btn-outline-success');
+                }
+                // Update stats
+                location.reload();
+            }
+        });
+    });
+});
+
+// Toggle liked status
+document.querySelectorAll('.toggle-liked').forEach(button => {
+    button.addEventListener('click', function() {
+        const recipeId = this.dataset.recipeId;
+        const button = this;
+        
+        fetch(`/api/recipe/${recipeId}/toggle_liked`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.liked) {
+                    button.innerHTML = '<i class="fas fa-heart"></i> Liked';
+                    button.classList.remove('btn-outline-danger');
+                    button.classList.add('btn-danger');
+                } else {
+                    button.innerHTML = '<i class="far fa-heart"></i> Like';
+                    button.classList.remove('btn-danger');
+                    button.classList.add('btn-outline-danger');
+                }
+                // Update stats
+                location.reload();
+            }
+        });
+    });
+});
+
+// Delete recipe
+document.querySelectorAll('.delete-recipe').forEach(button => {
+    button.addEventListener('click', function() {
+        const recipeId = this.dataset.recipeId;
+        const recipeName = this.dataset.recipeName;
+        
+        if (confirm(`Are you sure you want to delete "${recipeName}"?\n\nThis action cannot be undone.`)) {
+            fetch(`/api/recipe/${recipeId}/delete`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove the recipe card from the UI
+                    this.closest('.col-md-6').remove();
+                    // Update stats
+                    location.reload();
+                } else {
+                    alert('Error deleting recipe: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting recipe. Please try again.');
+            });
+        }
+    });
+});
+
+// Launch desktop cooking app
+document.querySelectorAll('.launch-cooking-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const recipeData = {
+            id: this.dataset.recipeId,
+            name: this.dataset.recipeName,
+            meal_type: this.dataset.mealType,
+            cooking_time: parseInt(this.dataset.cookingTime),
+            skill_level: this.dataset.skillLevel,
+            dietary_restrictions: this.dataset.dietary,
+            ingredients: JSON.parse(this.dataset.ingredients),
+            steps: JSON.parse(this.dataset.steps)
+        };
+        
+        launchDesktopCooking(recipeData);
+    });
+});
+
+// Launch Desktop Cooking App function
+function launchDesktopCooking(recipeData) {
+    
+    // Create deep link to launch desktop app
+    const deepLink = `suchef://recipe/${recipeData.id}`;
+    
+    const instructions = `🚀 Launch Desktop Cooking App
+
+Recipe: ${recipeData.name}
+Steps: ${recipeData.steps.length}
+
+Clicking "Launch" will attempt to open the Su-Chef desktop app with this recipe.
+
+If the desktop app doesn't open automatically, you may need to:
+1. Install the Su-Chef desktop app
+2. Ensure it's registered to handle 'suchef://' links
+3. Or manually open the desktop app and select this recipe`;
+    
+    if (confirm("Launch Desktop Cooking App?\n\n" + instructions)) {
+        try {
+            // Try to open the deep link
+            window.location.href = deepLink;
+            
+            // Fallback: show the deep link for manual use
+            setTimeout(() => {
+                alert(`✅ Deep link created: ${deepLink}\n\nIf the desktop app didn't open, copy this link and paste it in your browser or use it in the desktop app.`);
+            }, 1000);
+            
+        } catch (e) {
+            alert(`Error launching desktop app: ${e.message}\n\nDeep link: ${deepLink}`);
+        }
+    }
+}
+</script>
+{% endblock %}

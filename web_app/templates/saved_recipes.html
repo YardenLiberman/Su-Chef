@@ -1,0 +1,383 @@
+{% extends "base.html" %}
+
+{% block title %}Saved Recipes - Su-Chef{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-bookmark"></i> Saved Recipes</h1>
+    <a href="{{ url_for('create_recipe') }}" class="btn btn-primary">
+        <i class="fas fa-plus-circle"></i> Create New Recipe
+    </a>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <label for="mealTypeFilter" class="form-label">Meal Type</label>
+                <select class="form-select" id="mealTypeFilter">
+                    <option value="">All Types</option>
+                    <option value="breakfast">Breakfast</option>
+                    <option value="lunch">Lunch</option>
+                    <option value="dinner">Dinner</option>
+                    <option value="snack">Snack</option>
+                </select>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label for="skillLevelFilter" class="form-label">Skill Level</label>
+                <select class="form-select" id="skillLevelFilter">
+                    <option value="">All Levels</option>
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                </select>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label for="statusFilter" class="form-label">Status</label>
+                <select class="form-select" id="statusFilter">
+                    <option value="all" {% if current_filter == 'all' %}selected{% endif %}>All Saved</option>
+                    <option value="liked" {% if current_filter == 'liked' %}selected{% endif %}>Liked</option>
+                    <option value="cooked" {% if current_filter == 'cooked' %}selected{% endif %}>Cooked</option>
+                </select>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label for="searchFilter" class="form-label">Search</label>
+                <input type="text" class="form-control" id="searchFilter" placeholder="Recipe name...">
+            </div>
+        </div>
+        <div class="text-center">
+            <button class="btn btn-outline-secondary" id="clearFilters">
+                <i class="fas fa-times"></i> Clear Filters
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Recipe Count -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Showing <span id="recipeCount">{{ recipes|length }}</span> recipes</h5>
+</div>
+
+<!-- Recipe Grid -->
+<div class="row" id="recipeGrid">
+    {% for recipe in recipes %}
+    <div class="col-md-6 col-lg-4 mb-4 recipe-item" 
+         data-meal-type="{{ recipe.meal_type }}"
+         data-skill-level="{{ recipe.skill_level }}"
+         data-cooked="{{ 'true' if recipe.cooked else 'false' }}"
+         data-liked="{{ 'true' if recipe.liked else 'false' }}"
+         data-name="{{ recipe.name.lower() }}">
+        <div class="recipe-card">
+            <div class="recipe-header">
+                <h6 class="mb-1">{{ recipe.name }}</h6>
+                <small>
+                    <i class="fas fa-clock"></i> {{ recipe.cooking_time }} min |
+                    <i class="fas fa-signal"></i> {{ recipe.skill_level }}
+                </small>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-primary">{{ recipe.meal_type|title }}</span>
+                    {% if recipe.dietary_restrictions %}
+                        <span class="badge bg-warning">{{ recipe.dietary_restrictions }}</span>
+                    {% endif %}
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <small class="text-muted">
+                        <i class="fas fa-calendar"></i> {{ recipe.created_at[:10] if recipe.created_at else 'Unknown' }}
+                    </small>
+                    <div class="recipe-status">
+                        {% if recipe.cooked %}
+                            <span class="badge bg-success me-1" title="Cooked">
+                                <i class="fas fa-check-circle"></i>
+                            </span>
+                        {% endif %}
+                        {% if recipe.liked %}
+                            <span class="badge bg-danger" title="Liked">
+                                <i class="fas fa-heart"></i>
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="{{ url_for('view_recipe', recipe_id=recipe.id) }}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-eye"></i> View
+                    </a>
+                    <a href="{{ url_for('cook_recipe', recipe_id=recipe.id) }}" class="btn btn-success btn-sm">
+                        <i class="fas fa-play"></i> Cook
+                    </a>
+                </div>
+                
+                <div class="mt-2">
+                    <button class="btn btn-sm btn-outline-success toggle-cooked" data-recipe-id="{{ recipe.id }}">
+                        {% if recipe.cooked %}
+                            <i class="fas fa-check-circle"></i> Cooked
+                        {% else %}
+                            <i class="fas fa-circle"></i> Mark Cooked
+                        {% endif %}
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger toggle-liked" data-recipe-id="{{ recipe.id }}">
+                        {% if recipe.liked %}
+                            <i class="fas fa-heart"></i> Liked
+                        {% else %}
+                            <i class="far fa-heart"></i> Like
+                        {% endif %}
+                    </button>
+                    <button class="btn btn-sm btn-outline-warning delete-recipe" data-recipe-id="{{ recipe.id }}" data-recipe-name="{{ recipe.name }}">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- No Recipes Message -->
+<div id="noRecipesMessage" class="text-center py-5" style="display: none;">
+    <i class="fas fa-utensils fa-3x text-muted mb-3"></i>
+    <h5 class="text-muted">No recipes found</h5>
+    <p class="text-muted">Try adjusting your filters or create a new recipe!</p>
+    <a href="{{ url_for('create_recipe') }}" class="btn btn-primary">
+        <i class="fas fa-plus-circle"></i> Create Recipe
+    </a>
+</div>
+
+<!-- Recipe Count -->
+<div class="text-center mt-4">
+    <p class="text-muted">
+        Showing <span id="recipeCount">{{ recipes|length }}</span> recipe{{ 's' if recipes|length != 1 else '' }}
+    </p>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Filter functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const mealTypeFilter = document.getElementById('mealTypeFilter');
+    const skillLevelFilter = document.getElementById('skillLevelFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const searchFilter = document.getElementById('searchFilter');
+    const clearFiltersBtn = document.getElementById('clearFilters');
+    
+    // Add event listeners
+    mealTypeFilter.addEventListener('change', filterRecipes);
+    skillLevelFilter.addEventListener('change', filterRecipes);
+    statusFilter.addEventListener('change', filterRecipes);
+    searchFilter.addEventListener('input', filterRecipes);
+    clearFiltersBtn.addEventListener('click', clearFilters);
+    
+    // Initialize filters from URL parameters
+    initializeFiltersFromURL();
+});
+
+function filterRecipes() {
+    const mealType = document.getElementById('mealTypeFilter').value;
+    const skillLevel = document.getElementById('skillLevelFilter').value;
+    const status = document.getElementById('statusFilter').value;
+    const search = document.getElementById('searchFilter').value.toLowerCase();
+    
+    const recipeItems = document.querySelectorAll('.recipe-item');
+    let visibleCount = 0;
+    
+    recipeItems.forEach(item => {
+        let show = true;
+        
+        // Meal type filter
+        if (mealType && item.dataset.mealType !== mealType) {
+            show = false;
+        }
+        
+        // Skill level filter
+        if (skillLevel && item.dataset.skillLevel !== skillLevel) {
+            show = false;
+        }
+        
+        // Status filter
+        if (status && status !== 'all') {
+            if (status === 'cooked' && item.dataset.cooked !== 'true') {
+                show = false;
+            } else if (status === 'liked' && item.dataset.liked !== 'true') {
+                show = false;
+            }
+        }
+        
+        // Search filter
+        if (search && !item.dataset.name.includes(search)) {
+            show = false;
+        }
+        
+        // Show/hide item
+        if (show) {
+            item.style.display = 'block';
+            visibleCount++;
+        } else {
+            item.style.display = 'none';
+        }
+    });
+    
+    // Update recipe count
+    document.getElementById('recipeCount').textContent = visibleCount;
+    
+    // Show/hide no recipes message
+    const noRecipesMessage = document.getElementById('noRecipesMessage');
+    if (visibleCount === 0) {
+        noRecipesMessage.style.display = 'block';
+    } else {
+        noRecipesMessage.style.display = 'none';
+    }
+    
+    // Update URL with filters
+    updateURLWithFilters();
+}
+
+function clearFilters() {
+    document.getElementById('mealTypeFilter').value = '';
+    document.getElementById('skillLevelFilter').value = '';
+    document.getElementById('statusFilter').value = 'all';
+    document.getElementById('searchFilter').value = '';
+    filterRecipes();
+}
+
+function updateURLWithFilters() {
+    const mealType = document.getElementById('mealTypeFilter').value;
+    const skillLevel = document.getElementById('skillLevelFilter').value;
+    const status = document.getElementById('statusFilter').value;
+    const search = document.getElementById('searchFilter').value;
+    
+    const params = new URLSearchParams();
+    if (mealType) params.append('meal_type', mealType);
+    if (skillLevel) params.append('skill_level', skillLevel);
+    if (status) params.append('status', status);
+    if (search) params.append('search', search);
+    
+    const newURL = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+    window.history.replaceState({}, '', newURL);
+}
+
+function initializeFiltersFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    if (urlParams.has('meal_type')) {
+        document.getElementById('mealTypeFilter').value = urlParams.get('meal_type');
+    }
+    if (urlParams.has('skill_level')) {
+        document.getElementById('skillLevelFilter').value = urlParams.get('skill_level');
+    }
+    if (urlParams.has('status')) {
+        document.getElementById('statusFilter').value = urlParams.get('status');
+    }
+    if (urlParams.has('search')) {
+        document.getElementById('searchFilter').value = urlParams.get('search');
+    }
+    
+    // Apply filters if any are set
+    if (urlParams.toString()) {
+        filterRecipes();
+    }
+}
+
+// Toggle cooked status
+document.querySelectorAll('.toggle-cooked').forEach(button => {
+    button.addEventListener('click', function() {
+        const recipeId = this.dataset.recipeId;
+        const button = this;
+        
+        fetch(`/api/recipe/${recipeId}/toggle_cooked`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.cooked) {
+                    button.innerHTML = '<i class="fas fa-check-circle"></i> Cooked';
+                    button.classList.remove('btn-outline-success');
+                    button.classList.add('btn-success');
+                    button.closest('.recipe-item').dataset.cooked = 'true';
+                } else {
+                    button.innerHTML = '<i class="fas fa-circle"></i> Mark Cooked';
+                    button.classList.remove('btn-success');
+                    button.classList.add('btn-outline-success');
+                    button.closest('.recipe-item').dataset.cooked = 'false';
+                }
+                // Re-apply filters
+                filterRecipes();
+            }
+        });
+    });
+});
+
+// Toggle liked status
+document.querySelectorAll('.toggle-liked').forEach(button => {
+    button.addEventListener('click', function() {
+        const recipeId = this.dataset.recipeId;
+        const button = this;
+        
+        fetch(`/api/recipe/${recipeId}/toggle_liked`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.liked) {
+                    button.innerHTML = '<i class="fas fa-heart"></i> Liked';
+                    button.classList.remove('btn-outline-danger');
+                    button.classList.add('btn-danger');
+                    button.closest('.recipe-item').dataset.liked = 'true';
+                } else {
+                    button.innerHTML = '<i class="far fa-heart"></i> Like';
+                    button.classList.remove('btn-danger');
+                    button.classList.add('btn-outline-danger');
+                    button.closest('.recipe-item').dataset.liked = 'false';
+                }
+                // Re-apply filters
+                filterRecipes();
+            }
+        });
+    });
+});
+
+// Delete recipe
+document.querySelectorAll('.delete-recipe').forEach(button => {
+    button.addEventListener('click', function() {
+        const recipeId = this.dataset.recipeId;
+        const recipeName = this.dataset.recipeName;
+        
+        if (confirm(`Are you sure you want to delete "${recipeName}"?\n\nThis action cannot be undone.`)) {
+            fetch(`/api/recipe/${recipeId}/delete`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove the recipe card from the UI
+                    this.closest('.col-md-6').remove();
+                    // Re-apply filters to update count
+                    filterRecipes();
+                } else {
+                    alert('Error deleting recipe: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting recipe. Please try again.');
+            });
+        }
+    });
+});
+</script>
+{% endblock %}
