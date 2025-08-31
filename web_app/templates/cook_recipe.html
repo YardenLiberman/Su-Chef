@@ -87,19 +87,28 @@
                                 Your question will be answered by our AI cooking assistant using OpenAI
                             </small>
                         </div>
-                        <div id="answerDisplay" style="display: none;">
-                            <div class="alert alert-success">
-                                <h6><i class="fas fa-robot"></i> AI Su Chef Answer:</h6>
-                                <div id="aiAnswer"></div>
-                            </div>
-                        </div>
+                                                 <div id="voiceQuestionStatus" style="display: none;">
+                             <div class="alert alert-info">
+                                 <i class="fas fa-microphone-alt"></i> 
+                                 <span id="voiceQuestionText">Listening for your question...</span>
+                             </div>
+                         </div>
+                         <div id="answerDisplay" style="display: none;">
+                             <div class="alert alert-success">
+                                 <h6><i class="fas fa-robot"></i> AI Su Chef Answer:</h6>
+                                 <div id="aiAnswer"></div>
+                             </div>
+                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-warning" id="askQuestionBtn">
-                            <i class="fas fa-paper-plane"></i> Ask Question
-                        </button>
-                    </div>
+                                         <div class="modal-footer">
+                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                         <button type="button" class="btn btn-info" id="voiceQuestionBtn" style="display: none;">
+                             <i class="fas fa-microphone"></i> Ask with Voice
+                         </button>
+                         <button type="button" class="btn btn-warning" id="askQuestionBtn">
+                             <i class="fas fa-paper-plane"></i> Ask Question
+                         </button>
+                     </div>
                 </div>
             </div>
         </div>
@@ -139,31 +148,41 @@
                     <h4 id="currentStepText">{{ recipe.steps[0].step_text }}</h4>
                 </div>
                 
-                <!-- Voice Control Buttons -->
-                <div class="mt-4">
-                    <div class="d-flex justify-content-center gap-2 mb-3">
-                        <button class="btn btn-outline-primary btn-lg" id="prevStepBtn" disabled>
-                            <i class="fas fa-chevron-left"></i> Previous
-                        </button>
-                        <button class="btn btn-outline-info btn-lg" id="repeatStepBtn">
-                            <i class="fas fa-redo"></i> Repeat
-                        </button>
-                        <button class="btn btn-success btn-lg" id="nextStepBtn">
-                            <i class="fas fa-forward"></i> Next
-                        </button>
-                        <button class="btn btn-warning btn-lg" id="helpBtn">
-                            <i class="fas fa-question-circle"></i> Help
-                        </button>
-                                                 <button class="btn btn-danger btn-lg" id="endCookingBtn">
-                             <i class="fas fa-stop"></i> End Cooking
+                                 <!-- Voice Control Buttons -->
+                 <div class="mt-4">
+                     <div class="d-flex justify-content-center gap-2 mb-3">
+                         <button class="btn btn-outline-primary btn-lg" id="prevStepBtn" disabled>
+                             <i class="fas fa-chevron-left"></i> Previous
                          </button>
-                    </div>
-                    
-                    <div class="alert alert-info" id="voiceStatus">
-                        <i class="fas fa-info-circle"></i> 
-                                                 <span id="statusText">Use these buttons to control your cooking session. Click Start Voice Recognition to begin!</span>
-                    </div>
-                </div>
+                         <button class="btn btn-outline-info btn-lg" id="repeatStepBtn">
+                             <i class="fas fa-redo"></i> Repeat
+                         </button>
+                         <button class="btn btn-success btn-lg" id="nextStepBtn">
+                             <i class="fas fa-forward"></i> Next
+                         </button>
+                         <button class="btn btn-warning btn-lg" id="helpBtn">
+                             <i class="fas fa-question-circle"></i> Help
+                         </button>
+                                                  <button class="btn btn-danger btn-lg" id="endCookingBtn">
+                              <i class="fas fa-stop"></i> End Cooking
+                          </button>
+                     </div>
+                     
+                     <!-- Voice Recognition Status -->
+                     <div class="text-center mb-3">
+                         <div id="voiceRecognitionStatus" class="mt-2" style="display: none;">
+                             <div class="alert alert-warning">
+                                 <i class="fas fa-microphone-alt"></i> 
+                                 <span id="voiceRecognitionText">Listening for your command...</span>
+                             </div>
+                         </div>
+                     </div>
+                     
+                     <div class="alert alert-info" id="voiceStatus">
+                         <i class="fas fa-info-circle"></i> 
+                                                  <span id="statusText">Use these buttons to control your cooking session. Click Start Voice Recognition to begin!</span>
+                     </div>
+                 </div>
             </div>
         </div>
 
@@ -304,10 +323,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // No automatic voice - wait for user to click Start Voice Recognition
         updateVoiceStatus('🎤 Ready to help you cook! Click Start Voice Recognition to begin your cooking session.');
     
-        // Step navigation (for manual navigation)
-        document.getElementById('nextStepBtn').addEventListener('click', nextStep);
-        document.getElementById('prevStepBtn').addEventListener('click', previousStep);
-        
         // Timer controls
         document.getElementById('startTimer').addEventListener('click', startTimer);
         document.getElementById('pauseTimer').addEventListener('click', pauseTimer);
@@ -321,7 +336,7 @@ document.addEventListener('DOMContentLoaded', function() {
             checkbox.addEventListener('change', updateIngredientsProgress);
         });
         
-        // Voice cooking controls
+        // Cooking controls (step navigation and help)
         document.getElementById('prevStepBtn').addEventListener('click', previousStep);
         document.getElementById('repeatStepBtn').addEventListener('click', repeatStep);
         document.getElementById('nextStepBtn').addEventListener('click', nextStep);
@@ -343,6 +358,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Voice recognition toggle
         document.getElementById('voiceToggleBtn').addEventListener('click', toggleVoiceRecognition);
+        
+        // Voice recognition is now automatic - no button needed
+        
+        // Voice question button
+        document.getElementById('voiceQuestionBtn').addEventListener('click', startVoiceQuestion);
          
         // Regular keyboard functionality for the contenteditable div
         const questionDiv = document.getElementById('cookingQuestion');
@@ -427,6 +447,11 @@ function updateStepDisplay() {
 }
 
 function nextStep() {
+    // Stop any ongoing voice recognition when using regular buttons
+    if (isListening && recognition) {
+        recognition.stop();
+    }
+    
     if (currentStep < totalSteps) {
         currentStep++;
         updateStepDisplay();
@@ -435,7 +460,10 @@ function nextStep() {
         // Voice feedback - just say step number and read the step
         const step = recipeSteps[currentStep - 1];
         if (step) {
-            speakText(`Step ${currentStep}: ${step.step_text}`);
+            speakText(`Step ${currentStep}: ${step.step_text}`, () => {
+                // Start voice recognition immediately after step is finished reading
+                startVoiceRecognition();
+            });
         }
     } else {
         // Automatically finish cooking when on last step - handle exactly like End Cooking but without confirmation
@@ -444,6 +472,11 @@ function nextStep() {
 }
 
 function previousStep() {
+    // Stop any ongoing voice recognition when using regular buttons
+    if (isListening && recognition) {
+        recognition.stop();
+    }
+    
     if (currentStep > 1) {
         currentStep--;
         updateStepDisplay();
@@ -452,7 +485,10 @@ function previousStep() {
         // Voice feedback - just say step number and read the step
         const step = recipeSteps[currentStep - 1];
         if (step) {
-            speakText(`Step ${currentStep}: ${step.step_text}`);
+            speakText(`Step ${currentStep}: ${step.step_text}`, () => {
+                // Start voice recognition immediately after step is finished reading
+                startVoiceRecognition();
+            });
         }
     } else {
         speakText("You're already at the first step!");
@@ -460,6 +496,11 @@ function previousStep() {
 }
 
 function repeatStep() {
+    // Stop any ongoing voice recognition when using regular buttons
+    if (isListening && recognition) {
+        recognition.stop();
+    }
+    
     // Highlight current step briefly
     const currentStepElement = document.querySelector(`[data-step="${currentStep}"]`);
     currentStepElement.style.backgroundColor = '#e3f2fd';
@@ -471,7 +512,10 @@ function repeatStep() {
     const step = recipeSteps[currentStep - 1];
     if (step) {
         const stepText = `Step ${currentStep}: ${step.step_text}`;
-        speakText(stepText);
+        speakText(stepText, () => {
+            // Start voice recognition immediately after step is finished reading
+            startVoiceRecognition();
+        });
         document.getElementById('statusText').textContent = `Repeated step ${currentStep}`;
     }
 }
@@ -635,6 +679,11 @@ function updateButtonStates() {
 }
 
 function openHelpModal() {
+    // Stop any ongoing voice recognition when using regular buttons
+    if (isListening && recognition) {
+        recognition.stop();
+    }
+    
     // Reset the modal
     const questionDiv = document.getElementById('cookingQuestion');
     const answerDisplay = document.getElementById('answerDisplay');
@@ -647,12 +696,17 @@ function openHelpModal() {
         answerDisplay.style.display = 'none';
     }
     
-         // No voice feedback when opening help modal - completely silent
-     // speakText("Help modal opened. Type your question with your keyboard, then click Ask Question.");
+          // No voice feedback when opening help modal - completely silent
+      // speakText("Help modal opened. Type your question with your keyboard, then click Ask Question.");
     
     // Show the modal
     const modal = new bootstrap.Modal(document.getElementById('helpModal'));
     modal.show();
+    
+    // Show voice question button after modal opens
+    setTimeout(() => {
+        showVoiceQuestionButton();
+    }, 500);
     
     // Ensure modal is fully loaded before proceeding
     setTimeout(() => {
@@ -676,15 +730,18 @@ function openHelpModal() {
     }, 100);
 }
 
- function askCookingQuestion() {
-     console.log('🔍 askCookingQuestion function called');
-     
-     const question = document.getElementById('cookingQuestion').textContent.trim();
-     
-     if (!question) {
-         alert('Please enter a cooking question.');
-         return;
-     }
+  function askCookingQuestion() {
+      console.log('🔍 askCookingQuestion function called');
+      
+      // Hide voice question button when using regular ask button
+      hideVoiceQuestionButton();
+      
+      const question = document.getElementById('cookingQuestion').textContent.trim();
+      
+      if (!question) {
+          alert('Please enter a cooking question.');
+          return;
+      }
      
      // Debug: log the question to see if spaces are preserved
      console.log('Question being sent:', question);
@@ -775,22 +832,32 @@ function openHelpModal() {
                  
                                    console.log('✅ Answer elements created and displayed');
                   
-                  // Speak the answer
-                  console.log('🔊 About to speak answer:', data.answer);
-                  speakText(data.answer);
-                  console.log('✅ Answer spoken successfully');
-                  
-                                    // Update status to show question was answered
-                  const statusElement = document.getElementById('statusText');
-                  if (statusElement) {
-                      statusElement.textContent = `Question answered! Click any button to continue.`;
-                  }
+                                     // Speak the answer
+                   console.log('🔊 About to speak answer:', data.answer);
+                   speakText(data.answer);
+                   console.log('✅ Answer spoken successfully');
+                   
+                                     // Update status to show question was answered
+                   const statusElement = document.getElementById('statusText');
+                   if (statusElement) {
+                       statusElement.textContent = `Question answered! Click any button to continue.`;
+                   }
+                   
+                   // Show voice question button again after AI answer
+                   setTimeout(() => {
+                       showVoiceQuestionButton();
+                   }, 2000);
               } else {
                   console.error('❌ Modal body not found');
                   // Still try to speak the answer even if display fails
                   console.log('🔊 About to speak answer (display failed):', data.answer);
                   speakText(data.answer);
                   console.log('✅ Answer spoken successfully');
+                  
+                  // Show voice question button again after AI answer
+                  setTimeout(() => {
+                      showVoiceQuestionButton();
+                  }, 2000);
               }
         } else {
             console.error('❌ Invalid response structure:', data);
@@ -839,39 +906,51 @@ function openHelpModal() {
      });
 }
 
- function speakText(text) {
-     console.log('🔊 speakText called with:', text);
-     
-     // Use browser's built-in speech synthesis for immediate feedback
-     if ('speechSynthesis' in window) {
-         console.log('✅ SpeechSynthesis supported');
-         const utterance = new SpeechSynthesisUtterance(text);
-         utterance.rate = 0.9; // Slightly slower for clarity
-         utterance.pitch = 1.0;
-         utterance.volume = 1.0;
-         
-         // Always use the same male voice for consistency
-         const voices = speechSynthesis.getVoices();
-         console.log('🔍 Available voices:', voices.length);
-         const maleVoice = voices.find(voice => 
-             voice.name.includes('David') || 
-             voice.name.includes('Male') || 
-             voice.name.includes('en-US') ||
-             voice.lang === 'en-US'
-         );
-         if (maleVoice) {
-             utterance.voice = maleVoice;
-             console.log('✅ Using voice:', maleVoice.name);
-         } else {
-             console.log('⚠️ No male voice found, using default');
-         }
-         
-         console.log('🔊 Starting speech synthesis...');
-         speechSynthesis.speak(utterance);
-         console.log('✅ Speech synthesis started');
-     } else {
-         console.error('❌ SpeechSynthesis not supported');
-     }
+ function speakText(text, onComplete = null) {
+    console.log('🔊 speakText called with:', text);
+    
+    // Use browser's built-in speech synthesis for immediate feedback
+    if ('speechSynthesis' in window) {
+        console.log('✅ SpeechSynthesis supported');
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.9; // Slightly slower for clarity
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+        
+        // Always use the same male voice for consistency
+        const voices = speechSynthesis.getVoices();
+        console.log('🔍 Available voices:', voices.length);
+        const maleVoice = voices.find(voice => 
+            voice.name.includes('David') || 
+            voice.name.includes('Male') || 
+            voice.name.includes('en-US') ||
+            voice.lang === 'en-US'
+        );
+        if (maleVoice) {
+            utterance.voice = maleVoice;
+            console.log('✅ Using voice:', maleVoice.name);
+        } else {
+            console.log('⚠️ No male voice found, using default');
+        }
+        
+        // Add callback when speech finishes
+        if (onComplete) {
+            utterance.onend = function() {
+                console.log('🔊 Speech finished, calling callback');
+                onComplete();
+            };
+        }
+        
+        console.log('🔊 Starting speech synthesis...');
+        speechSynthesis.speak(utterance);
+        console.log('✅ Speech synthesis started');
+    } else {
+        console.error('❌ SpeechSynthesis not supported');
+        // If speech synthesis not supported, call callback immediately
+        if (onComplete) {
+            onComplete();
+        }
+    }
     
     // Also call our Azure Speech API for better quality (optional)
     fetch('/api/voice/speak', {
@@ -902,32 +981,305 @@ function updateVoiceStatus(message) {
     console.log('Voice Status:', message);
 }
 
-  function toggleVoiceRecognition() {
-     const voiceToggleBtn = document.getElementById('voiceToggleBtn');
-     
-     // Voice feedback - welcome message and first step
-             speakText("Hey, I'm your Su Chef cooking assistant, let's start cooking!");
-     
-     // Wait a moment then read the first step
-     setTimeout(() => {
-         const firstStep = recipeSteps[0];
-         if (firstStep) {
-             speakText(`Step 1: ${firstStep.step_text}`);
-         }
-         updateVoiceStatus('🎤 Voice mode active! Use the buttons below to control your cooking.');
-     }, 3000);
-     
-     // Update button state
-     voiceToggleBtn.innerHTML = '<i class="fas fa-microphone"></i> Voice Mode Active';
-     voiceToggleBtn.classList.remove('btn-outline-primary');
-     voiceToggleBtn.classList.add('btn-success');
-     
-     // Update status
-     updateVoiceStatus('🎤 Voice mode active! Reading first step...');
-     
-     // Disable the button after activation
-     voiceToggleBtn.disabled = true;
+     function toggleVoiceRecognition() {
+      const voiceToggleBtn = document.getElementById('voiceToggleBtn');
+      
+      // Voice feedback - welcome message and first step
+              speakText("Hey, I'm your Su Chef cooking assistant, let's start cooking!");
+      
+      // Wait a moment then read the first step
+      setTimeout(() => {
+          const firstStep = recipeSteps[0];
+          if (firstStep) {
+              speakText(`Step 1: ${firstStep.step_text}`, () => {
+                  // Start voice recognition immediately after first step is finished reading
+                  startVoiceRecognition();
+              });
+          }
+          updateVoiceStatus('🎤 Voice mode active! I will automatically listen for your commands after each step.');
+      }, 3000);
+      
+      // Update button state
+      voiceToggleBtn.innerHTML = '<i class="fas fa-microphone"></i> Voice Mode Active';
+      voiceToggleBtn.classList.remove('btn-outline-primary');
+      voiceToggleBtn.classList.add('btn-success');
+      
+      // Update status
+      updateVoiceStatus('🎤 Voice mode active! Reading first step...');
+      
+      // Disable the button after activation
+      voiceToggleBtn.disabled = true;
   }
+
+// Voice Recognition Functions
+let recognition = null;
+let isListening = false;
+let recognitionTimeout = null;
+
+function initializeVoiceRecognition() {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+        
+        recognition.onstart = function() {
+            console.log('🎤 Voice recognition started');
+            isListening = true;
+            updateVoiceRecognitionStatus('Listening for your command... Say "next", "previous", "repeat", "help", or "end cooking"', 'warning');
+        };
+        
+        recognition.onresult = function(event) {
+            const command = event.results[0][0].transcript.toLowerCase().trim();
+            console.log('🎤 Voice command received:', command);
+            processVoiceCommand(command);
+        };
+        
+        recognition.onerror = function(event) {
+            console.error('❌ Voice recognition error:', event.error);
+            isListening = false;
+            hideVoiceRecognitionStatus();
+            speakText('Sorry, I didn\'t understand. Please use the buttons below to continue.');
+        };
+        
+        recognition.onend = function() {
+            console.log('🎤 Voice recognition ended');
+            isListening = false;
+            hideVoiceRecognitionStatus();
+        };
+    } else {
+        console.warn('⚠️ Speech recognition not supported in this browser');
+    }
+}
+
+function showVoiceRecognitionButton() {
+    const startSpeakingBtn = document.getElementById('startSpeakingBtn');
+    if (startSpeakingBtn) {
+        startSpeakingBtn.style.display = 'inline-block';
+        startSpeakingBtn.innerHTML = '<i class="fas fa-microphone"></i> Start Speaking';
+        startSpeakingBtn.disabled = false;
+    }
+}
+
+function hideVoiceRecognitionButton() {
+    const startSpeakingBtn = document.getElementById('startSpeakingBtn');
+    if (startSpeakingBtn) {
+        startSpeakingBtn.style.display = 'none';
+    }
+}
+
+function updateVoiceRecognitionStatus(text, type = 'warning') {
+    const statusDiv = document.getElementById('voiceRecognitionStatus');
+    const textSpan = document.getElementById('voiceRecognitionText');
+    if (statusDiv && textSpan) {
+        statusDiv.style.display = 'block';
+        textSpan.textContent = text;
+        statusDiv.querySelector('.alert').className = `alert alert-${type}`;
+    }
+}
+
+function hideVoiceRecognitionStatus() {
+    const statusDiv = document.getElementById('voiceRecognitionStatus');
+    if (statusDiv) {
+        statusDiv.style.display = 'none';
+    }
+}
+
+function startVoiceRecognition() {
+    if (!recognition) {
+        initializeVoiceRecognition();
+    }
+    
+    if (recognition && !isListening) {
+        recognition.start();
+        
+        // Set 8-second timeout
+        recognitionTimeout = setTimeout(() => {
+            if (isListening) {
+                recognition.stop();
+                speakText('Time\'s up! Please use the buttons below to continue with your cooking.');
+            }
+        }, 8000);
+    }
+}
+
+function processVoiceCommand(command) {
+    console.log('🔍 Processing voice command:', command);
+    
+    // Clear timeout
+    if (recognitionTimeout) {
+        clearTimeout(recognitionTimeout);
+        recognitionTimeout = null;
+    }
+    
+    // Send command to backend for processing
+    fetch('/api/voice/cooking_command', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            command: command
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('✅ Voice command processed:', data.command);
+            executeVoiceCommand(data.command);
+        } else {
+            console.log('❌ Voice command not recognized:', data.message);
+            speakText(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('❌ Error processing voice command:', error);
+        speakText('Sorry, there was an error processing your command. Please use the buttons below to continue.');
+    });
+}
+
+function executeVoiceCommand(command) {
+    console.log('🎯 Executing voice command:', command);
+    
+    switch(command) {
+        case 'next':
+            nextStep();
+            break;
+        case 'previous':
+            previousStep();
+            break;
+        case 'repeat':
+            repeatStep();
+            break;
+        case 'help':
+            openHelpModal();
+            break;
+        case 'end_cooking':
+            completeCookingSession();
+            break;
+        default:
+            console.log('❌ Unknown command:', command);
+            speakText('Command not recognized. Please use the buttons below to continue.');
+    }
+}
+
+// Voice Question Functions
+let questionRecognition = null;
+let isListeningForQuestion = false;
+let questionRecognitionTimeout = null;
+
+function initializeVoiceQuestion() {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        questionRecognition = new SpeechRecognition();
+        
+        questionRecognition.continuous = false;
+        questionRecognition.interimResults = false;
+        questionRecognition.lang = 'en-US';
+        
+        questionRecognition.onstart = function() {
+            console.log('🎤 Voice question recognition started');
+            isListeningForQuestion = true;
+            updateVoiceQuestionStatus('Listening for your question...', 'info');
+        };
+        
+        questionRecognition.onresult = function(event) {
+            const question = event.results[0][0].transcript.trim();
+            console.log('🎤 Voice question received:', question);
+            processVoiceQuestion(question);
+        };
+        
+        questionRecognition.onerror = function(event) {
+            console.error('❌ Voice question recognition error:', event.error);
+            isListeningForQuestion = false;
+            hideVoiceQuestionStatus();
+            showVoiceQuestionButton();
+            speakText('Sorry, I didn\'t understand your question. Please try again.');
+        };
+        
+        questionRecognition.onend = function() {
+            console.log('🎤 Voice question recognition ended');
+            isListeningForQuestion = false;
+            hideVoiceQuestionStatus();
+            showVoiceQuestionButton();
+        };
+    } else {
+        console.warn('⚠️ Speech recognition not supported in this browser');
+    }
+}
+
+function showVoiceQuestionButton() {
+    const voiceQuestionBtn = document.getElementById('voiceQuestionBtn');
+    if (voiceQuestionBtn) {
+        voiceQuestionBtn.style.display = 'inline-block';
+        voiceQuestionBtn.innerHTML = '<i class="fas fa-microphone"></i> Ask with Voice';
+        voiceQuestionBtn.disabled = false;
+    }
+}
+
+function hideVoiceQuestionButton() {
+    const voiceQuestionBtn = document.getElementById('voiceQuestionBtn');
+    if (voiceQuestionBtn) {
+        voiceQuestionBtn.style.display = 'none';
+    }
+}
+
+function updateVoiceQuestionStatus(text, type = 'info') {
+    const statusDiv = document.getElementById('voiceQuestionStatus');
+    const textSpan = document.getElementById('voiceQuestionText');
+    if (statusDiv && textSpan) {
+        statusDiv.style.display = 'block';
+        textSpan.textContent = text;
+        statusDiv.querySelector('.alert').className = `alert alert-${type}`;
+    }
+}
+
+function hideVoiceQuestionStatus() {
+    const statusDiv = document.getElementById('voiceQuestionStatus');
+    if (statusDiv) {
+        statusDiv.style.display = 'none';
+    }
+}
+
+function startVoiceQuestion() {
+    if (!questionRecognition) {
+        initializeVoiceQuestion();
+    }
+    
+    if (questionRecognition && !isListeningForQuestion) {
+        hideVoiceQuestionButton();
+        questionRecognition.start();
+        
+        // Set 12-second timeout for questions
+        questionRecognitionTimeout = setTimeout(() => {
+            if (isListeningForQuestion) {
+                questionRecognition.stop();
+                speakText('Time\'s up! Please try asking your question again.');
+            }
+        }, 12000);
+    }
+}
+
+function processVoiceQuestion(question) {
+    console.log('🔍 Processing voice question:', question);
+    
+    // Clear timeout
+    if (questionRecognitionTimeout) {
+        clearTimeout(questionRecognitionTimeout);
+        questionRecognitionTimeout = null;
+    }
+    
+    // Set the question in the text area
+    const questionDiv = document.getElementById('cookingQuestion');
+    if (questionDiv) {
+        questionDiv.textContent = question;
+    }
+    
+    // Automatically ask the question
+    askCookingQuestion();
+}
 
 // Keyboard shortcuts
 document.addEventListener('keydown', function(e) {

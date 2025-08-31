@@ -428,7 +428,19 @@ def ask_cooking_question():
             print(f"❌ OpenAI API key missing")
             return jsonify({'success': False, 'error': 'OpenAI not configured'}), 400
         
-        data = request.get_json()
+        try:
+            data = request.get_json()
+            print(f"🔍 Raw request data: {data}")
+            print(f"🔍 Request content type: {request.content_type}")
+            print(f"🔍 Request headers: {dict(request.headers)}")
+        except Exception as e:
+            print(f"❌ Failed to parse JSON: {str(e)}")
+            return jsonify({'success': False, 'error': f'Invalid JSON: {str(e)}'}), 400
+        
+        if not data:
+            print(f"❌ No data received")
+            return jsonify({'success': False, 'error': 'No data received'}), 400
+            
         question = data.get('question', '')
         recipe_context = data.get('recipe_context', '')
         
@@ -474,6 +486,71 @@ def ask_cooking_question():
     except Exception as e:
         print(f"❌ Error in cooking question endpoint: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/voice/cooking_command', methods=['POST'])
+def handle_cooking_voice_command():
+    """Handle voice commands for cooking navigation"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Not authenticated'})
+    
+    try:
+        data = request.get_json()
+        command = data.get('command', '').lower().strip()
+        
+        print(f"🔍 Voice command received: '{command}'")
+        
+        # Define valid cooking commands
+        valid_commands = {
+            'next': 'next',
+            'next step': 'next',
+            'next step please': 'next',
+            'go to next': 'next',
+            'previous': 'previous',
+            'prev': 'previous',
+            'previous step': 'previous',
+            'go back': 'previous',
+            'repeat': 'repeat',
+            'repeat step': 'repeat',
+            'say again': 'repeat',
+            'help': 'help',
+            'i need help': 'help',
+            'help me': 'help',
+            'end cooking': 'end_cooking',
+            'end': 'end_cooking',
+            'finish cooking': 'end_cooking',
+            'stop cooking': 'end_cooking',
+            'done': 'end_cooking'
+        }
+        
+        # Find the best match for the command
+        matched_command = None
+        for voice_phrase, action in valid_commands.items():
+            if command in voice_phrase or voice_phrase in command:
+                matched_command = action
+                break
+        
+        if matched_command:
+            print(f"✅ Voice command recognized: {matched_command}")
+            return jsonify({
+                'success': True,
+                'command': matched_command,
+                'message': f'Voice command recognized: {matched_command}'
+            })
+        else:
+            print(f"❌ Voice command not recognized: '{command}'")
+            return jsonify({
+                'success': False,
+                'error': 'Command not recognized',
+                'message': f'Voice command "{command}" not recognized. Please try: next, previous, repeat, help, or end cooking.'
+            })
+            
+    except Exception as e:
+        print(f"❌ Error in voice command endpoint: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'message': 'Error processing voice command'
+        })
 
 # WebSocket Events
 @socketio.on('connect')
