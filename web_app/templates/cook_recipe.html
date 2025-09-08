@@ -168,6 +168,14 @@
                           </button>
                      </div>
                      
+                     <!-- Start Speaking Button -->
+                     <div class="text-center mb-3">
+                         <button class="btn btn-outline-success btn-lg" id="startSpeakingBtn" style="display: none;">
+                             <i class="fas fa-microphone"></i> Start Speaking
+                         </button>
+                         <small class="d-block text-muted mt-2">Click "Start Speaking" to use voice commands for 8 seconds</small>
+                     </div>
+                     
                      <!-- Voice Recognition Status -->
                      <div class="text-center mb-3">
                          <div id="voiceRecognitionStatus" class="mt-2" style="display: none;">
@@ -310,6 +318,7 @@ let currentStep = 1;
 let timerRunning = false;
 let timerInterval;
 let seconds = 0;
+let cookingSessionEnding = false;
 
 // Voice feedback system - text-to-speech only for now
 
@@ -359,7 +368,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Voice recognition toggle
         document.getElementById('voiceToggleBtn').addEventListener('click', toggleVoiceRecognition);
         
-        // Voice recognition is now automatic - no button needed
+        // Start Speaking button
+        document.getElementById('startSpeakingBtn').addEventListener('click', startVoiceRecognition);
         
         // Voice question button
         document.getElementById('voiceQuestionBtn').addEventListener('click', startVoiceQuestion);
@@ -460,10 +470,7 @@ function nextStep() {
         // Voice feedback - just say step number and read the step
         const step = recipeSteps[currentStep - 1];
         if (step) {
-            speakText(`Step ${currentStep}: ${step.step_text}`, () => {
-                // Start voice recognition immediately after step is finished reading
-                startVoiceRecognition();
-            });
+            speakText(`Step ${currentStep}: ${step.step_text}`);
         }
     } else {
         // Automatically finish cooking when on last step - handle exactly like End Cooking but without confirmation
@@ -485,10 +492,7 @@ function previousStep() {
         // Voice feedback - just say step number and read the step
         const step = recipeSteps[currentStep - 1];
         if (step) {
-            speakText(`Step ${currentStep}: ${step.step_text}`, () => {
-                // Start voice recognition immediately after step is finished reading
-                startVoiceRecognition();
-            });
+            speakText(`Step ${currentStep}: ${step.step_text}`);
         }
     } else {
         speakText("You're already at the first step!");
@@ -512,10 +516,7 @@ function repeatStep() {
     const step = recipeSteps[currentStep - 1];
     if (step) {
         const stepText = `Step ${currentStep}: ${step.step_text}`;
-        speakText(stepText, () => {
-            // Start voice recognition immediately after step is finished reading
-            startVoiceRecognition();
-        });
+        speakText(stepText);
         document.getElementById('statusText').textContent = `Repeated step ${currentStep}`;
     }
 }
@@ -984,6 +985,9 @@ function updateVoiceStatus(message) {
      function toggleVoiceRecognition() {
       const voiceToggleBtn = document.getElementById('voiceToggleBtn');
       
+      // Reset cooking session ending flag
+      cookingSessionEnding = false;
+      
       // Voice feedback - welcome message and first step
               speakText("Hey, I'm your Su Chef cooking assistant, let's start cooking!");
       
@@ -991,12 +995,9 @@ function updateVoiceStatus(message) {
       setTimeout(() => {
           const firstStep = recipeSteps[0];
           if (firstStep) {
-              speakText(`Step 1: ${firstStep.step_text}`, () => {
-                  // Start voice recognition immediately after first step is finished reading
-                  startVoiceRecognition();
-              });
+              speakText(`Step 1: ${firstStep.step_text}`);
           }
-          updateVoiceStatus('🎤 Voice mode active! I will automatically listen for your commands after each step.');
+          updateVoiceStatus('🎤 Voice mode active! Click "Start Speaking" to use voice commands.');
       }, 3000);
       
       // Update button state
@@ -1004,8 +1005,11 @@ function updateVoiceStatus(message) {
       voiceToggleBtn.classList.remove('btn-outline-primary');
       voiceToggleBtn.classList.add('btn-success');
       
+      // Show the Start Speaking button
+      showVoiceRecognitionButton();
+      
       // Update status
-      updateVoiceStatus('🎤 Voice mode active! Reading first step...');
+      updateVoiceStatus('🎤 Voice mode active! Click "Start Speaking" to use voice commands.');
       
       // Disable the button after activation
       voiceToggleBtn.disabled = true;
@@ -1042,12 +1046,16 @@ function initializeVoiceRecognition() {
             isListening = false;
             hideVoiceRecognitionStatus();
             speakText('Sorry, I didn\'t understand. Please use the buttons below to continue.');
+            // Show the Start Speaking button again after error
+            showVoiceRecognitionButton();
         };
         
         recognition.onend = function() {
             console.log('🎤 Voice recognition ended');
             isListening = false;
             hideVoiceRecognitionStatus();
+            // Show the Start Speaking button again when recognition ends
+            showVoiceRecognitionButton();
         };
     } else {
         console.warn('⚠️ Speech recognition not supported in this browser');
@@ -1093,6 +1101,9 @@ function startVoiceRecognition() {
     }
     
     if (recognition && !isListening) {
+        // Hide the Start Speaking button
+        hideVoiceRecognitionButton();
+        
         recognition.start();
         
         // Set 8-second timeout
@@ -1100,6 +1111,8 @@ function startVoiceRecognition() {
             if (isListening) {
                 recognition.stop();
                 speakText('Time\'s up! Please use the buttons below to continue with your cooking.');
+                // Show the Start Speaking button again after timeout
+                showVoiceRecognitionButton();
             }
         }, 8000);
     }
@@ -1132,11 +1145,18 @@ function processVoiceCommand(command) {
         } else {
             console.log('❌ Voice command not recognized:', data.message);
             speakText(data.message);
+            // Show the Start Speaking button again after unrecognized command
+            showVoiceRecognitionButton();
         }
     })
     .catch(error => {
         console.error('❌ Error processing voice command:', error);
-        speakText('Sorry, there was an error processing your command. Please use the buttons below to continue.');
+        // Don't show error message if cooking session is ending
+        if (!cookingSessionEnding) {
+            speakText('Sorry, there was an error processing your command. Please use the buttons below to continue.');
+            // Show the Start Speaking button again after error
+            showVoiceRecognitionButton();
+        }
     });
 }
 
@@ -1157,12 +1177,22 @@ function executeVoiceCommand(command) {
             openHelpModal();
             break;
         case 'end_cooking':
+            // Set flag to prevent error messages
+            cookingSessionEnding = true;
+            // Stop voice recognition before ending cooking session
+            if (isListening && recognition) {
+                recognition.stop();
+            }
             completeCookingSession();
-            break;
+            // Don't show Start Speaking button for end_cooking since session is over
+            return;
         default:
             console.log('❌ Unknown command:', command);
             speakText('Command not recognized. Please use the buttons below to continue.');
     }
+    
+    // Show the Start Speaking button again after command execution (except for end_cooking)
+    showVoiceRecognitionButton();
 }
 
 // Voice Question Functions
